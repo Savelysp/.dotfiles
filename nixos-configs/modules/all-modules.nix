@@ -13,5 +13,6 @@
     ./keyd.nix
     ./udisks.nix
     ./ssh.nix
+    ./niri.nix
   ];
 }
