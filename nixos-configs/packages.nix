@@ -5,6 +5,9 @@
     neovim  # Better vim
     emacs   # Best editor
 
+    # Wayland
+    fuzzel
+
     # CLI 
     btop    # Better top
     zoxide  # Better cd
