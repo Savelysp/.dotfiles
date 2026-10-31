@@ -7,9 +7,14 @@
 
     # Wayland
     fuzzel
-    swww
+    awww
     waybar
     wl-clipboard
+
+    # Desktop
+    telegram-desktop
+    mpv
+    zathura
 
     # CLI 
     btop    # Better top
@@ -20,6 +25,7 @@
     ripgrep # Better grep
     fzf     # Fuzzy finder
     stow    # Dotfiles manager
+    brightnessctl  # Brightness control
 
     # Useless CLI
     fastfetch  # Best fetch
@@ -40,6 +46,7 @@
    
     # Term
     alacritty  # Terminal emulator
+    ueberzugpp # Image support
     starship   # Shell prompt
   ];
 
