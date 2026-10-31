@@ -1,0 +1,17 @@
+.config/emacs/
+!.config/emacs/init.el
+!.config/emacs/emacs.org
+
+.config/tmux/plugins
+.config/QtProject.conf
+.config/pavucontrol.ini
+.config/nvim/lazy-lock.json
+.config/nvim.back
+.config/lazygit
+.config/gpick
+.config/lazydocker
+.config/flameshot
+.config/cava/shaders
+.config/chromium/
+
+.config/StardewValley/
