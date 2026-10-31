@@ -7,6 +7,9 @@
 
     # Wayland
     fuzzel
+    swww
+    waybar
+    wl-clipboard
 
     # CLI 
     btop    # Better top
