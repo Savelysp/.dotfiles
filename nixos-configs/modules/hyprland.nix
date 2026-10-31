@@ -1,0 +1,3 @@
+{
+  services.hyprland.enable = true;
+}
