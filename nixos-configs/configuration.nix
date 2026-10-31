@@ -5,7 +5,7 @@
     ./modules/all-modules.nix 
   ];
 
-  # disabledModules = [];
+  disabledModules = [ ./modules/hyperland.nix ];
 
   time.timeZone = "Europe/Minsk";
 
