@@ -10,7 +10,7 @@ alias enw="emacs -nw"
 alias n="nvim"
 alias cl="clear"
 
-alias nixreb="nixos-rebuild switch --flake /home/ifmund/nixos-configs"
+alias nixreb="sudo nixos-rebuild switch --flake /home/ifmund/nixos-configs"
 
 #HISTSIZE=10000
 #SAVEHIST=10000
