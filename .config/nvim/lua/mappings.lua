@@ -111,7 +111,7 @@ map("t", "<C-x>", "<C-\\><C-N>", { desc = "terminal escape terminal mode" })
 map('n', '<leader>sf', '<cmd>ToggleTerm direction=float<CR>', { desc = "" })
 map('n', '<leader>sh', '<cmd>ToggleTerm direction=horizontal<CR>', { desc = "" })
 map('n', '<leader>sv', '<cmd>ToggleTerm direction=vertical<CR>', { desc = "" })
-map('n', '<leader>sc', '<cmd>ToggleTermCloseAll<CR>', { desc = "" })
+map('n', '<leader>sc', '<cmd>ToggleTermToggleAll<CR>', { desc = "" })
 
 
     --
