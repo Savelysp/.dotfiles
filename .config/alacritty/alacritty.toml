@@ -3,13 +3,15 @@
 # general.import = ["~/.config/alacritty/themes/dracula.toml"]
 # general.import = ["~/.config/alacritty/themes/kanagawa_wave.toml"]
 # general.import = ["~/.config/alacritty/themes/doom_one.toml"]
-general.import = ["~/.config/alacritty/themes/radium.toml"]
+# general.import = ["~/.config/alacritty/themes/radium.toml"]
+general.import = ["~/.config/alacritty/themes/monokai_pro.toml"]
+# general.import = ["~/.config/alacritty/themes/sonokai.toml"]
 
 [window]
 padding.x = 5
 padding.y = 5
 
-opacity = 0.9
+opacity = 0.95
 
 [font]
 normal.family = "JetBrains Mono Nerd Font"

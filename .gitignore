@@ -15,3 +15,9 @@
 .config/chromium/
 
 .config/StardewValley/
+/.config/environment.d/10-home-manager.conf
+/.config/fontconfig/conf.d
+/.config/mimeapps.list
+/.config/pulse
+/.config/systemd/user
+/.config/udiskie
