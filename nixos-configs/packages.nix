@@ -1,4 +1,6 @@
 { pkgs, ... }: {
+
+  nixpkgs.config.allowUnfree = true;
   environment.systemPackages = with pkgs; [
     # Text Editors
     vim     # Base editor
@@ -10,9 +12,13 @@
     awww
     waybar
     wl-clipboard
+    xwayland-satellite
 
     # Desktop
     telegram-desktop
+    steam 
+    discord
+    spotify
     mpv
     zathura
 
@@ -43,6 +49,13 @@
 
     # File manager
     yazi
+
+    # Code
+    gcc
+    tree-sitter
+    python314
+    python314Packages.pip
+    nodejs
    
     # Term
     alacritty  # Terminal emulator

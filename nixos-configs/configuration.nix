@@ -6,7 +6,7 @@
   ];
 
   # disabledModules = [];
-
+  hardware.graphics.enable32Bit = true;
   time.timeZone = "Europe/Minsk";
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];

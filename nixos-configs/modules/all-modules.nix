@@ -8,7 +8,7 @@
     ./bluetooth.nix
     ./touchpad.nix
     ./docker.nix
-    ./login.nix
+    # ./login.nix
     ./firefox.nix
     ./keyd.nix
     ./udisks.nix
