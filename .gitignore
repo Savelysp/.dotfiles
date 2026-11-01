@@ -21,3 +21,6 @@
 /.config/pulse
 /.config/systemd/user
 /.config/udiskie
+/.config/btop
+/.config/spotify
+/.config/opencode/opencode.jsonc
