@@ -101,7 +101,7 @@ spawn-at-startup "waybar"
 
 // Обои
 spawn-at-startup "awww-daemon"
-spawn-sh-at-startup "awww img ~/wallpapers/0002.jpg"
+spawn-sh-at-startup "awww img \"$(find ~/wallpapers -type f | shuf -n1)\""
 
 // Буфен обмена
 spawn-at-startup "wl-paste" "--type" "text"
@@ -152,10 +152,13 @@ binds {
     Mod+O repeat=false { toggle-overview; }
 
     // Приложения
-    Mod+D        hotkey-overlay-title="Open fuzzel" { spawn "fuzzel"; }
+    Mod+D        hotkey-overlay-title="Open fuzzel"    { spawn "fuzzel"; }
     Mod+Return   hotkey-overlay-title="Open alacritty" { spawn "alacritty"; }
-    Mod+Shift+F  hotkey-overlay-title="Open firefox" { spawn "firefox"; }
-    Mod+Shift+T  hotkey-overlay-title="Open telegram" { spawn "Telegram"; }
+    Mod+Shift+F  hotkey-overlay-title="Open firefox"   { spawn "firefox"; }
+    Mod+Shift+T  hotkey-overlay-title="Open telegram"  { spawn "Telegram"; }
+    Mod+Shift+S  hotkey-overlay-title="Open steam"     { spawn "steam"; }
+    Mod+Shift+M  hotkey-overlay-title="Open spotify"   { spawn "spotify"; }
+    Mod+W        hotkey-overlay-title="Random wallpaper" { spawn-sh "awww img -t any --transition-duration 0.5 \"$(find ~/wallpapers -type f | shuf -n1)\""; }
 
     Mod+C repeat=false { close-window; }
 
