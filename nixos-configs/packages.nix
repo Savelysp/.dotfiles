@@ -14,6 +14,10 @@
     wl-clipboard
     xwayland-satellite
 
+    # AI
+    opencode
+    # openclaw
+
     # Desktop
     telegram-desktop
     steam 
