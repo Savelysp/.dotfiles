@@ -4,8 +4,14 @@ return {
 
   opts = {
     spec = {
-      { "<leader>f", group = "file" },
+      { "<leader>b", group = "буферы" },
+      { "<leader>f", group = "файлы" },
       { "<leader>g", group = "git" },
+      { "<leader>h", group = "git hunks" },
+      { "<leader>l", group = "LSP" },
+      { "<leader>n", group = "вид" },
+      { "<leader>s", group = "терминал" },
+      { "<leader>w", group = "вкладки" },
     },
 
     plugins = {

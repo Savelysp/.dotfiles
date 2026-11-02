@@ -3,13 +3,12 @@ return {
     "loctvl842/monokai-pro.nvim",
     lazy = false,
     priority = 1000,
-    config = function()
-      require("monokai-pro").setup({
-        transparent_background = false,
-        -- background_clear = {
-        --   "nvim-tree", -- Прозрачный фон для nvim-tree
-        -- },
-      })
+    opts = {
+      transparent_background = false,
+    },
+    config = function(_, opts)
+      require("monokai-pro").setup(opts)
+      pcall(vim.cmd.colorscheme, "monokai-pro")
     end,
   },
 

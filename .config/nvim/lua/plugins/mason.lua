@@ -4,10 +4,6 @@ return {
     cmd = "Mason",
     build = ":MasonUpdate",
     opts = {
-      ensure_installed = {
-        "mypy",
-        "debugpy",
-      },
       ui = {
         border = "rounded",
         icons = {
@@ -30,7 +26,19 @@ return {
         "ruff",
         "rust_analyzer",
       },
-      automatic_installation = true,
+      -- Серверы включаются явно в lspconfig.lua, чтобы не было двух источников правды
+      automatic_enable = false,
+    },
+  },
+  {
+    -- Не-LSP инструменты (mypy, debugpy, stylua и т.п.)
+    "WhoIsSethDaniel/mason-tool-installer.nvim",
+    dependencies = { "williamboman/mason.nvim" },
+    opts = {
+      ensure_installed = {
+        "mypy",
+        "debugpy",
+      },
     },
   },
 }

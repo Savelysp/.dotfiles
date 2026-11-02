@@ -8,7 +8,7 @@ return {
 
     -- Что скрывать на время показа dashboard
     hide = {
-      statusline = false,
+      statusline = true,
       tabline    = true,
       winbar     = true,
     },
@@ -76,7 +76,6 @@ return {
         },
       },
 
-      footer = { "hello world" },
       vertical_center = false,
     },
   },

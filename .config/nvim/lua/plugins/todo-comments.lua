@@ -1,11 +1,6 @@
 return {
   "folke/todo-comments.nvim",
   dependencies = { "nvim-lua/plenary.nvim" },
-  -- opts = {
-  --   highlight = {
-  --     comments_only = false, -- временно отключить проверку через Tree-sitter
-  --   },
-  -- },
-
-  -- event = { "BufReadPre", "BufNewFile" },
+  -- Подсветка нужна только когда открыт буфер, нет смысла грузить при старте
+  event = { "BufReadPost", "BufNewFile" },
 }

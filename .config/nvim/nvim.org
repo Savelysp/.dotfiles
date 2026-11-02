@@ -1,0 +1,143 @@
+#+title: Neovim: идеи плагинов
+#+startup: overview
+#+filetags: :nvim:plugins:
+
+Файл-напоминалка: плагины, которые хочется попробовать, но пока не установлены.
+Это не конфиг — Neovim его не читает. Когда решение созреет, спецификация
+добавляется в =~/.config/nvim/lua/plugins/<имя>.lua=.
+
+* Как добавить плагин
+1. Создать =lua/plugins/<имя>.lua=:
+
+#+begin_src lua
+return {
+  "author/plugin.nvim",
+  event = "VeryLazy",
+  opts = {},
+}
+#+end_src
+
+2. Перезапустить Neovim, выполнить =:Lazy= и проверить =:checkhealth=.
+3. Экспериментальные плагины ставить отдельным коммитом, чтобы легко откатить.
+
+* Уведомления и интерфейс
+** noice.nvim
+- Репозиторий: [[https://github.com/folke/noice.nvim][folke/noice.nvim]]
+- Зависимости: =nui.nvim=, =nvim-notify=
+- Что даёт: заменяет командную строку, =:messages= и уведомления на всплывающие окна.
+- Зачем: убирает «прыгающие» сообщения внизу и делает ввод команд нагляднее.
+- Статус: отложено
+
+** snacks.nvim
+- Репозиторий: [[https://github.com/folke/snacks.nvim][folke/snacks.nvim]]
+- Что даёт: набор независимых модулей — picker (замена Telescope), terminal, notifier,
+  indent, scroll, dashboard, zen и другие.
+- Зачем: можно включить только нужные модули и постепенно заменить часть текущих плагинов.
+- Статус: отложено
+
+** trouble.nvim
+- Репозиторий: [[https://github.com/folke/trouble.nvim][folke/trouble.nvim]]
+- Что даёт: аккуратный список диагностик, quickfix, LSP-ссылок и символов.
+- Зачем: удобнее стандартного =:copen=, особенно при большом числе ошибок.
+- Статус: отложено
+
+** lspsaga.nvim
+- Репозиторий: [[https://github.com/nvimdev/lspsaga.nvim][nvimdev/lspsaga.nvim]]
+- Что даёт: UI для LSP — hover, signature help, rename, code action, диагностика.
+- Зачем: больше информации при работе с LSP без перехода в отдельные окна.
+- Статус: отложено
+
+** nvim-ufo
+- Репозиторий: [[https://github.com/kevinhwang91/nvim-ufo][kevinhwang91/nvim-ufo]]
+- Зависимости: =promise-async=
+- Что даёт: сворачивание кода на основе Treesitter/LSP с окном предпросмотра.
+- Зачем: аккуратные fold'ы в больших файлах.
+- Статус: отложено
+
+* Навигация и поиск
+** flash.nvim
+- Репозиторий: [[https://github.com/folke/flash.nvim][folke/flash.nvim]]
+- Что даёт: улучшенный поиск и прыжки по меткам, интеграция с Treesitter и операторами.
+- Зачем: современная замена hop/leap, хорошо сочетается с текущими маппингами.
+- Статус: отложено
+
+** hop.nvim
+- Репозиторий: [[https://github.com/phaazon/hop.nvim][phaazon/hop.nvim]]
+- Что даёт: прыжки по тексту по подсказкам-меткам (EasyMotion-подобно).
+- Зачем: быстро перемещаться по видимой части файла.
+- Статус: отложено — сначала посмотреть flash.nvim
+
+** leap.nvim
+- Репозиторий: [[https://github.com/ggandor/leap.nvim][ggandor/leap.nvim]]
+- Что даёт: минималистичные прыжки по двум символам.
+- Зачем: очень быстрый способ попасть в нужное место без плагинов-комбайнов.
+- Статус: отложено
+
+** harpoon
+- Репозиторий: [[https://github.com/ThePrimeagen/harpoon][ThePrimeagen/harpoon]]
+- Что даёт: закрепление файлов проекта и мгновенное переключение между ними.
+- Зачем: держать под рукой 3–5 рабочих файлов без Telescope.
+- Статус: отложено
+
+** project.nvim
+- Репозиторий: [[https://github.com/ahmedkhalf/project.nvim][ahmedkhalf/project.nvim]]
+- Что даёт: определение корня проекта и автопереключение рабочей директории.
+- Зачем: корректные пути в Telescope/LSP при работе из любого места.
+- Статус: отложено
+
+** oil.nvim
+- Репозиторий: [[https://github.com/stevearc/oil.nvim][stevearc/oil.nvim]]
+- Что даёт: файловый менеджер, в котором файловая система редактируется как обычный буфер.
+- Зачем: альтернатива nvim-tree без отдельного окна.
+- Статус: отложено
+
+* Редактирование текста
+** mini.nvim
+- Репозиторий: [[https://github.com/echasnovski/mini.nvim][echasnovski/mini.nvim]]
+- Что даёт: набор независимых модулей:
+  - =mini.pairs= — автозакрытие скобок и кавычек;
+  - =mini.ai= — текстовые объекты (аргументы, функции и т.п.);
+  - =mini.icons= — иконки для файлов и плагинов;
+  - =mini.surround= — окружение текста (добавить/изменить/удалить скобки);
+  - =mini.move= — перемещение строк и блоков.
+- Зачем: лёгкие замены нескольким отдельным плагинам.
+- Статус: отложено — ставить только нужные модули
+
+** typewriter.nvim
+- Репозиторий: [[https://github.com/2nit/typewriter.nvim][2nit/typewriter.nvim]]
+- Что даёт: держит курсор ближе к центру экрана при наборе и прокрутке.
+- Зачем: комфортное письмо на широком мониторе.
+- Статус: отложено
+
+* Отладка
+** nvim-dap
+- Репозиторий: [[https://github.com/mfussenegger/nvim-dap][mfussenegger/nvim-dap]]
+- Что даёт: реализация Debug Adapter Protocol — точки останова, шаги, переменные, стек.
+- Вместе с: =nvim-dap-ui= (панели), =nvim-dap-python= (Python), =mason-nvim-dap= (адаптеры через Mason).
+- Замечание: =debugpy= уже ставится через =mason-tool-installer=, но без DAP-фронтенда он не используется.
+- Статус: отложено
+
+* Развлечения
+** duck.nvim
+- Репозиторий: [[https://github.com/tamton-aquib/duck.nvim][tamton-aquib/duck.nvim]]
+- Что даёт: утка, которая ходит по коду.
+- Зачем: шутка для разрядки.
+- Статус: отложено
+
+** dealwithit.vim
+- Репозиторий: [[https://github.com/AndrewRadev/dealwithit.vim][AndrewRadev/dealwithit.vim]]
+- Что даёт: анимация «deal with it» с собакой в очках.
+- Зачем: шутка; написан на Vim script, работает и в Neovim.
+- Статус: отложено
+
+** vim-be-good
+- Репозиторий: [[https://github.com/ThePrimeagen/vim-be-good][ThePrimeagen/vim-be-good]]
+- Что даёт: мини-игры для тренировки движений Vim.
+- Зачем: разминка и практика хоткеев.
+- Статус: отложено
+
+** cool-retro-term
+- Репозиторий: [[https://github.com/Swordfish90/cool-retro-term][Swordfish90/cool-retro-term]]
+- Что даёт: отдельный терминал в стиле CRT-монитора.
+- Зачем: не плагин Neovim — просто запустить =nvim= внутри него.
+- Статус: отложено
