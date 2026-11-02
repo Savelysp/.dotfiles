@@ -9,75 +9,69 @@ g.mapleader = " "
 g.maplocalleader = "\\"
 
 --------------------------------------------------
-
--- Поддержка true colors
+-- Внешний вид
+--------------------------------------------------
 opt.termguicolors = true
-
--- Статус панель
 o.laststatus = 3
 o.showmode = false
-
--- Буфер обмена
-o.clipboard = "unnamedplus"
-
--- Выделение строки
 o.cursorline = true
 o.cursorlineopt = "number"
-
--- Отступы
-o.expandtab = true   -- Использовать пробелы вместо табов
-o.shiftwidth = 2     -- Размер отступа при сдвиге
-o.smartindent = true -- Автоматически добавлять отступы в новых строках
-o.tabstop = 2        -- Количество пробелов, в табе
-o.softtabstop = 2    -- Сколько пробелов удаляется при нажатии Backspace
-o.autoindent = true  -- Копирует отступ предыдущей строки
-o.smarttab = true    -- Чуть более умный таб
-
--- Уберает символы в конце буфера
+o.number = true
+o.relativenumber = true
+o.numberwidth = 3
+o.ruler = false
+o.signcolumn = "yes"
 opt.fillchars = { eob = " " }
+opt.shortmess:append "sI"
 
--- Умный поиск
+--------------------------------------------------
+-- Отступы
+--------------------------------------------------
+o.expandtab = true
+o.shiftwidth = 2
+o.tabstop = 2
+o.softtabstop = 2
+o.autoindent = true
+
+--------------------------------------------------
+-- Поиск
+--------------------------------------------------
 o.ignorecase = true
 o.smartcase = true
 o.hlsearch = true
 o.incsearch = true
 
--- Мышь
+--------------------------------------------------
+-- Буфер обмена, мышь, прокрутка
+--------------------------------------------------
+o.clipboard = "unnamedplus"
 o.mouse = "a"
-o.mousefocus = true
+o.scrolloff = 8
+o.sidescrolloff = 8
+opt.whichwrap:append "<>[]hl"
 
--- Минимальный отступ при прокрутке.
-vim.opt.scrolloff = 30
-
--- Нумерация строк
-o.number = true
-o.relativenumber = true
-o.numberwidth = 2
-o.ruler = false
-
--- Отключить nvim intro
-opt.shortmess:append "sI"
-
--- Отображение колонки значков
-o.signcolumn = "yes"
-
--- Поведение сплитов
+--------------------------------------------------
+-- Сплиты
+--------------------------------------------------
 o.splitbelow = true
 o.splitright = true
 
--- Время ожидания в миллисекундах для ввода комманд
-o.timeoutlen = 400
-
--- Включить файлы истории отмен
-o.undofile = true
-
--- Время в миллисекундах перед записью swap-файла (время неактивности)
+--------------------------------------------------
+-- Тайминги и файлы
+--------------------------------------------------
+o.timeoutlen = 300
 o.updatetime = 250
+o.undofile = true
+o.confirm = true
 
--- Разрешить переход к следующей/предыдущей строке с помощью клавиш h, l
-opt.whichwrap:append "<>[]hl"
+--------------------------------------------------
+-- Дополнение
+--------------------------------------------------
+o.completeopt = "menu,menuone,noselect"
 
--- Отключение встроенных провайдеров Neovim для разных языков (ускоряет загрузку)
+--------------------------------------------------
+-- Провайдеры Neovim (не нужны, ускоряют загрузку)
+--------------------------------------------------
 g.loaded_node_provider = 0
 g.loaded_python3_provider = 0
 g.loaded_perl_provider = 0
