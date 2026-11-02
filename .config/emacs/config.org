@@ -1,0 +1,516 @@
+#+TITLE: IF_mund's GNU Emacs Config
+#+AUTHOR: Savelysp (IF_mund)
+#+DESCRIPTION: IF_mund's personal Emacs config.
+#+STARTUP: content
+#+OPTIONS: toc:2
+
+* Base Config
+** Base
+#+begin_src emacs-lisp
+  (setq
+   ;; Disable startup message
+   inhibit-startup-message t) 
+
+  (scroll-bar-mode -1)             ;; Disable visible scrollbar
+  (tool-bar-mode -1)               ;; Disable toolbar
+  (tooltip-mode -1)                ;; Disable tooltips
+  (menu-bar-mode -1)               ;; Disable menu bar
+
+  (set-fringe-mode 4)              ;; Change space
+
+  ;; transparency
+  (set-frame-parameter nil 'alpha-background 95)
+  (add-to-list 'default-frame-alist '(alpha-background . 95))
+
+  ;; tabs settings
+  (setq-default indent-tabs-mode nil)
+  (setq-default tab-width 4)
+#+end_src
+
+** Line numbers
+#+begin_src emacs-lisp
+  (column-number-mode)
+  (global-display-line-numbers-mode t)
+  (setq display-line-numbers-type 'relative)
+
+  (dolist (mode '(term-mode-hook
+                  shell-mode-hook
+                  eshell-mode-hook
+                  org-mode-hook 
+                  visual-fill-column-mode-hook))
+    (add-hook mode (lambda () (display-line-numbers-mode 0))))
+#+end_src
+
+** Smooth scroll
+На данный момент не используется
+#+begin_src emacs-lisp
+  ;;(setq redisplay-dont-pause t
+  ;;  scroll-margin 1
+  ;;  scroll-step 1
+  ;;  scroll-conservatively 10000
+  ;;  scroll-preserve-screen-position 1)
+   
+  ;;  (setq pixel-scroll-precision-large-scroll-height 40.0)
+   
+  ;;  (setq mouse-wheel-scroll-amount '(1 ((shift) . 1))) ;; one line at a time
+   
+  ;;  (setq mouse-wheel-progressive-speed nil) ;; don't accelerate scrolling
+   
+  ;;  (setq mouse-wheel-follow-mouse 't) ;; scroll window under mouse
+   
+  ;;  (setq scroll-step 1) ;; keyboard scroll one line at a time
+#+end_src
+
+** Other
+#+begin_src emacs-lisp
+  ;; Make ESC quit prompts
+  (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+
+  ;; Set starter page
+  ;; (setq initial-buffer-choice "~/.config/emacs/start.org")
+#+end_src
+
+* Package managment
+#+begin_src emacs-lisp
+  (require 'package)
+  (setq package-archives '(("melpa" . "https://melpa.org/packages/")
+                           ("elpa" . "https://elpa.gnu.org/packages/")
+                           ("org" . "https://orgmode.org/elpa/")))
+  (package-initialize)
+  (unless package-archive-contents
+    (package-refresh-contents))
+
+
+  (unless (package-installed-p 'use-package)
+    (package-install 'use-package))
+  (eval-when-compile (require 'use-package))
+  ;; (require 'package)
+
+
+  (setq use-package-always-ensure t)
+#+end_src
+
+* Org mode
+** Org
+#+begin_src emacs-lisp
+  (use-package org
+    :hook
+    (org-mode . org-indent-mode)
+    (org-mode . variable-pitch-mode)
+    (org-mode . visual-line-mode) 
+    :config
+    (setq org-ellipsis " ▾"
+          org-hide-emphasis-markers t))
+
+  ;; open links
+  (setf (cdr (assoc 'file org-link-frame-setup)) 'find-file)
+  
+    ;; Ensure that anything that should be fixed-pitch in Org files appears that way
+  (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
+  (set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
+  (set-face-attribute 'org-table nil   :inherit '(shadow fixed-pitch))
+  (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
+  (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
+  (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
+  (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch)
+#+end_src
+
+** Org-toc
+#+begin_src emacs-lisp
+  (use-package toc-org
+    :commands toc-org-enable
+    :init (add-hook 'org-mode-hook 'toc-org-enable))
+#+end_src
+
+** Org-bullets
+#+begin_src emacs-lisp
+  (use-package org-bullets
+    :after org
+    :hook (org-mode . org-bullets-mode)
+    :custom
+    (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
+
+  (dolist (face '((org-level-1 . 1.2)
+                  (org-level-2 . 1.1)
+                  (org-level-3 . 1.05)
+                  (org-level-4 . 1.0)
+                  (org-level-5 . 1.1)
+                  (org-level-6 . 1.1)
+                  (org-level-7 . 1.1)
+                  (org-level-8 . 1.1)))
+    (set-face-attribute (car face) nil :font "Canarell" :weight 'regular :height (cdr face)))
+
+  ;;(defun efs/org-font-setup ()
+  ;; Replace list hyphen with dot
+  (font-lock-add-keywords 'org-mode
+                          '(("^ *\\([-]\\) "
+                             (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
+#+end_src
+
+** Visual fill column
+#+begin_src emacs-lisp
+  (defun efs/org-mode-visual-fill ()
+    (setq visual-fill-column-width 150
+          visual-fill-column-center-text t)
+    (visual-fill-column-mode -1))
+
+  (use-package visual-fill-column
+    :hook (org-mode . efs/org-mode-visual-fill))
+#+end_src
+
+** Org tempo
+#+begin_src emacs-lisp
+  (require 'org-tempo)
+  (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
+  (add-to-list 'org-structure-template-alist '("py" . "src python"))
+  (add-to-list 'org-structure-template-alist '("sh" . "src shell"))
+  (add-to-list 'org-structure-template-alist '("lua" . "src lua"))
+  (add-to-list 'org-structure-template-alist '("hs" . "src haskell"))
+  (add-to-list 'org-structure-template-alist '("jv" . "src java"))
+  (add-to-list 'org-structure-template-alist '("cc" . "src C"))
+  (add-to-list 'org-structure-template-alist '("sq" . "src SQL"))
+#+end_src
+
+** Org indent
+#+begin_src emacs-lisp
+  (defun my-indent-org-block-automatically ()
+    (interactive)
+    (when (org-in-src-block-p)
+      (org-edit-special)
+      (indent-region (point-min) (point-max))
+      (org-edit-src-exit)))
+
+  (define-key org-mode-map
+              (kbd "C-i") #'my-indent-org-block-automatically)
+#+end_src
+
+** Org roam
+#+begin_src emacs-lisp
+  (use-package org-roam
+    :custom
+    (org-roam-directory "~/RoamNotes")
+    (org-roam-completion-everywhere t)
+    (org-roam-capture-templates
+     '(("d" "default"
+        plain "%?"
+        :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+        :unnarrowed t)
+       ("p" "Project"
+        plain (file "~/RoamNotes/Templates/ProjectNoteTemplate.org")
+        :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+        :unnarrowed t)
+       ("b" "Book note"
+        plain (file "~/RoamNotes/Templates/BookNoteTemplate.org")
+        :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+        :unnarrowed t)))
+    :bind (("C-c n l" . org-roam-buffer-toggle)
+           ("C-c n f" . org-roam-node-find)
+           ("C-c n i" . org-roam-node-insert)
+           ("C-M-i"   . completion-at-point))
+    :config
+    (org-roam-setup))
+#+end_src
+
+** TODO Other
+Тут просто решил забить пока
+#+begin_src emacs-lisp
+;; (setq org-todo-keywords
+;;     '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d!)")
+;;       (sequence "PLAN(p)" "READY(r)" "ACTIVE(a)" "REVIEW(v)" "HOLD(h)" "|" "COMPLETED(c)" "CANC(k@)")))
+#+end_src 
+
+* TODO IDE Settings
+lsp и всё сопутствующее я не понял вообще как делать
+** TODO Projectile
+я блин хз, почему дашборд не видит проекты
+#+begin_src emacs-lisp
+  (use-package projectile
+    :config
+    (projectile-mode)
+    :custom
+    ((projectile-completion-system 'ivy))
+    :bind-keymap
+    ("C-c p" . projectile-command-map))
+    ;; :init
+    ;; ;; NOTE: Set this to the folder where you keep your Git repos!
+    ;; ;; (when (file-directory-p "~/projects")
+    ;; ;; (setq projectile-project-search-path '("~/projects"))
+    ;; (projectile-discover-projects-in-directory "~/projects/" 1)
+    ;; (setq projectile-switch-project-action #'projectile-dired))
+
+  (use-package counsel-projectile
+    :after projectile
+    :config
+    (counsel-projectile-mode))
+#+end_src
+
+** TODO Magit
+на него я просто пока не смотрел
+#+begin_src emacs-lisp
+  ;; (use-package magit
+  ;;   :commands (magit-status magit-get-current-branch)
+  ;;   :custom
+  ;;   (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
+
+  ;; (use-package evil-magit
+  ;;  :after magit)
+
+  ;; (use-package forge)
+#+end_src
+
+** TODO Lsp
+#+begin_src emacs-lisp
+  ;; (defun efs/lsp-mode-setup ()
+  ;;   (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
+  ;;   (lsp-headerline-breadcrumb-mode))
+
+  ;; (use-package lsp-mode
+  ;;   :commands (lsp lsp-deferred)
+  ;;   :init
+  ;;   ;; set prefix for lsp-command-keymap
+  ;;   (setq lsp-keymap-prefix "C-c l")
+  ;;   :hook (;; set language
+  ;;          (python-ts-mode . lsp-deferred)
+  ;;          ;; headerline
+  ;;          (lsp-mode . efs/lsp-mode-setup)
+  ;;          ;; which-key integration
+  ;;          (lsp-mode . lsp-enable-which-key-integration)))
+#+end_src
+
+** TODO Lsp extension
+#+begin_src emacs-lisp
+  ;; (use-package lsp-ui
+  ;;   :hook (lsp-mode . lsp-ui-mode)
+  ;;   :custom
+  ;;   (lsp-ui-doc-position 'bottom))
+
+  ;; (use-package lsp-ivy)
+
+  ;; (use-package lsp-treemacs
+  ;;   :after lsp)
+#+end_src
+
+** TODO Company mode
+#+begin_src emacs-lisp
+  ;; (use-package company
+  ;;   :after lsp-mode
+  ;;   :hook (lsp-mode . company-mode)
+  ;;   :bind (:map company-active-map
+  ;;          ("<tab>" . company-complete-selection))
+  ;;         (:map lsp-mode-map
+  ;;          ("<tab>" . company-indent-or-complete-common))
+  ;;   :custom
+  ;;   (company-minimum-prefix-length 1)
+  ;;   (company-idle-delay 0.0))
+
+  ;; (use-package company-box
+  ;;   :hook (company-mode . company-box-mode))
+#+end_src
+
+** TODO Dap mode
+#+begin_src emacs-lisp
+  ;; (use-package dap-mode
+  ;;   :after lsp-mode)
+#+end_src
+
+** TODO Tree-sitter
+#+begin_src emacs-lisp
+  ;; (setq treesit-language-source-alist
+  ;;       '((bash "https://github.com/tree-sitter/tree-sitter-bash")
+  ;;         (elisp "https://github.com/Wilfred/tree-sitter-elisp")
+  ;;         (python "https://github.com/tree-sitter/tree-sitter-python")))
+
+  ;; (mapc #'treesit-install-language-grammar (mapcar #'car treesit-language-source-alist))
+  
+  ;; (setq major-mode-remap-alist
+  ;;       '((bash-mode . bash-ts-mode)
+  ;;         (python-mode . python-ts-mode)))
+#+end_src
+
+** TODO Languages
+*** TODO Python
+#+begin_src emacs-lisp
+  ;; (use-package python-mode
+  ;;   :custom
+  ;;   ;; NOTE: Set these if Python 3 is called "python3" on your system!
+  ;;   ;; (python-shell-interpreter "python3")
+  ;;   ;; (dap-python-executable "python3")
+  ;;   (dap-python-debugger 'debugpy)
+  ;;   ;; :hook
+  ;;   ;; (python-mode . tree-sitter-mode)
+  ;;   ;; (python-mode . tree-sitter-hl-mode)
+  ;;   :config
+  ;;   (require 'dap-python))
+
+  ;; (use-package pyvenv
+  ;;   :config
+  ;;   (pyvenv-mode 1))
+
+  ;; (use-package lsp-pyright
+  ;;   :custom (lsp-pyright-langserver-command "pyright") ;; or basedpyright
+  ;;   :hook (python-mode . (lambda ()
+  ;;                          (require 'lsp-pyright)
+  ;;                          (lsp-deferred))))  ;; or lsp
+#+end_src
+
+*** Lua
+#+begin_src emacs-lisp
+  (use-package lua-mode)
+#+end_src
+
+*** Haskell
+#+begin_src emacs-lisp
+  (use-package haskell-mode)
+#+end_src
+
+* Beauty
+** DOOM modeline
+#+begin_src emacs-lisp
+  (use-package doom-modeline
+    :init (doom-modeline-mode 1))
+#+end_src
+
+** Doom Themes
+#+begin_src emacs-lisp
+  (use-package doom-themes
+    :config
+    ;; (load-theme 'doom-material t))
+    ;; (load-theme 'doom-nord t))
+    ;; (load-theme 'doom-tokyo-night t))
+    ;; (load-theme 'doom-gruvbox t))
+    ;; (load-theme 'doom-solarized-dark t))
+    ;; (load-theme 'doom-dracula t))
+    (load-theme 'doom-monokai-pro t))
+#+end_src
+
+** Rainbow delimiters
+#+begin_src emacs-lisp
+  (use-package rainbow-delimiters
+    :hook (prog-mode . rainbow-delimiters-mode))
+#+end_src
+
+** Centered cursor
+#+begin_src emacs-lisp
+  (use-package centered-cursor-mode
+    :demand
+    :config
+    ;; Optional, enables centered-cursor-mode in all buffers.
+    (global-centered-cursor-mode))
+#+end_src
+
+** all the icons
+#+begin_src emacs-lisp
+  (use-package all-the-icons)
+  ;; M-x all-the-icons-install-fonts
+#+end_src
+
+** Page-break-lines
+#+begin_src emacs-lisp
+(use-package page-break-lines)
+#+end_src
+
+** Dashboard
+#+begin_src emacs-lisp
+  (use-package dashboard
+    :init
+    (setq initial-buffer-choice 'dashboard-open)
+    (setq dashboard-set-heading-icons t)
+    (setq dashboard-set-file-icons t)
+    ;; (setq dashboard-center-content t)
+    ;; (setq dashboard-vertically-center-content t)
+    (setq dashboard-items '((recents . 5)
+                            (agenda . 5 )
+                            (bookmarks . 3)
+                            (projects . 3)))
+    (setq dashboard-startup-banner 1)
+    :config
+    (dashboard-setup-startup-hook))
+#+end_src
+
+* Other Packages
+** Ivy
+#+begin_src emacs-lisp
+  (use-package ivy
+    :bind (("C-s" . swiper)
+           :map ivy-minibuffer-map
+           ("TAB" . ivy-alt-done)
+           ("C-l" . ivy-alt-done)
+           ("C-j" . ivy-next-line)
+           ("C-k" . ivy-previous-line)
+           :map ivy-switch-buffer-map
+           ("C-k" . ivy-previous-line)
+           ("C-l" . ivy-done)
+           ("C-d" . ivy-switch-buffer-kill))
+    :config
+    (ivy-mode t))
+#+end_src
+
+** Ivy rich
+#+begin_src emacs-lisp
+  (use-package ivy-rich
+    :init
+    (ivy-rich-mode t))
+#+end_src
+
+** Which Key
+#+begin_src emacs-lisp
+  (use-package which-key
+    :init
+    (which-key-mode))
+#+end_src
+
+** Counsel
+#+begin_src emacs-lisp
+  (use-package counsel
+    :init
+    (counsel-mode)
+    :bind
+    ("C-x b" . counsel-switch-buffer))
+
+  ;; (global-set-key (kbd "C-M-j") 'counsel-switch-buffer)
+#+end_src
+
+** Helpfull
+#+begin_src emacs-lisp
+  (use-package helpful
+    :custom
+    (counsel-describe-function-function #'helpful-callable)
+    (counsel-describe-variable-function #'helpful-variable)
+    :bind
+    ([remap describe-function] . counsel-describe-function)
+    ([remap describe-command] . helpful-command)
+    ([remap describe-variable] . counsel-describe-variable)
+    ([remap describe-key] . helpful-key))
+#+end_src
+
+** Evil mode
+#+begin_src emacs-lisp
+  (use-package evil
+    :init
+    (setq evil-want-integration t)
+    (setq evil-want-keybinding nil)
+    :config
+    (evil-mode t))
+
+  (use-package evil-collection
+    :after evil
+    :config
+    (evil-collection-init))
+#+end_src
+
+** Commenter
+#+begin_src emacs-lisp
+  (use-package evil-nerd-commenter
+    :bind ("M-/" . evilnc-comment-or-uncomment-lines))
+#+end_src
+
+** General
+#+begin_src emacs-lisp
+  ;; (use-package general)
+#+end_src
+
+** Hydra
+#+begin_src emacs-lisp
+  ;; (use-package hydra)
+#+end_src
+
