@@ -5,7 +5,6 @@
 .config/tmux/plugins
 .config/QtProject.conf
 .config/pavucontrol.ini
-.config/nvim/lazy-lock.json
 .config/nvim.back
 .config/lazygit
 .config/gpick
