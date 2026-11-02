@@ -38,7 +38,6 @@ return {
       ensure_installed = {
         "mypy",
         "debugpy",
-        "stylua",
       },
     },
   },
