@@ -1,7 +1,7 @@
-{ pkgs, ... }: {
+{ pkgs, inputs, ... }: {
 
   nixpkgs.config.allowUnfree = true;
-  environment.systemPackages = with pkgs; [
+  environment.systemPackages = (with pkgs; [
     # Text Editors
     vim     # Base editor
     neovim  # Better vim
@@ -15,8 +15,7 @@
     xwayland-satellite
 
     # AI
-    opencode
-    # openclaw
+    llama-cpp
 
     # Desktop
     telegram-desktop
@@ -65,6 +64,8 @@
     alacritty  # Terminal emulator
     ueberzugpp # Image support
     starship   # Shell prompt
+  ]) ++ [
+    inputs.nixpkgs-unstable.legacyPackages.x86_64-linux.opencode
   ];
 
 

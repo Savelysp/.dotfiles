@@ -8,12 +8,13 @@
     ./bluetooth.nix
     ./touchpad.nix
     ./docker.nix
-    # ./login.nix
+    ./swapfile.nix
     ./firefox.nix
     ./keyd.nix
     ./udisks.nix
     ./ssh.nix
     ./niri.nix
     #./hyprland.nix
+    #./login.nix
   ];
 }
