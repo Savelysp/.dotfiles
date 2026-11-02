@@ -3,7 +3,7 @@ return {
   version = "*",
 
   -- Загружаем лениво
-  cmd = { "ToggleTerm", "TermExec" },
+  cmd = { "ToggleTerm", "TermExec", "ToggleTermToggleAll" },
 
   opts = {
     shade_terminals = true,

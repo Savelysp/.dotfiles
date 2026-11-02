@@ -1,133 +1,115 @@
 local map = vim.keymap.set
 
 --------------------------------------------------
+-- Insert mode: перемещение курсора
+--------------------------------------------------
+map("i", "<C-b>", "<ESC>^i", { desc = "В начало строки" })
+map("i", "<C-e>", "<End>", { desc = "В конец строки" })
+map("i", "<C-h>", "<Left>", { desc = "Влево" })
+map("i", "<C-l>", "<Right>", { desc = "Вправо" })
+map("i", "<C-j>", "<Down>", { desc = "Вниз" })
+map("i", "<C-k>", "<Up>", { desc = "Вверх" })
+map("i", "jk", "<ESC>", { desc = "Выйти из Insert" })
 
--- Insert mode movement mappings
-map("i", "<C-b>", "<ESC>^i", { desc = "move beginning of line" })
-map("i", "<C-e>", "<End>", { desc = "move end of line" })
-map("i", "<C-h>", "<Left>", { desc = "move left" })
-map("i", "<C-l>", "<Right>", { desc = "move right" })
-map("i", "<C-j>", "<Down>", { desc = "move down" })
-map("i", "<C-k>", "<Up>", { desc = "move up" })
+--------------------------------------------------
+-- Командный режим
+--------------------------------------------------
+map("n", ";", ":", { desc = "Командный режим" })
 
--- Command mode
-map("n", ";", ":", { desc = "CMD enter command mode" })
+--------------------------------------------------
+-- Окна
+--------------------------------------------------
+map("n", "<C-h>", "<C-w>h", { desc = "Окно влево" })
+map("n", "<C-l>", "<C-w>l", { desc = "Окно вправо" })
+map("n", "<C-j>", "<C-w>j", { desc = "Окно вниз" })
+map("n", "<C-k>", "<C-w>k", { desc = "Окно вверх" })
 
--- Exit Insert mode
-map("i", "jk", "<ESC>")
+--------------------------------------------------
+-- Поиск и файл
+--------------------------------------------------
+map("n", "<leader>nh", "<cmd>noh<CR>", { desc = "Убрать подсветку поиска" })
+map("n", "<C-s>", "<cmd>w<CR>", { desc = "Сохранить файл" })
+map("n", "<C-c>", "<cmd>%y+<CR>", { desc = "Скопировать файл целиком" })
 
--- Normal mode window movement
-map("n", "<C-h>", "<C-w>h", { desc = "switch window left" })
-map("n", "<C-l>", "<C-w>l", { desc = "switch window right" })
-map("n", "<C-j>", "<C-w>j", { desc = "switch window down" })
-map("n", "<C-k>", "<C-w>k", { desc = "switch window up" })
+--------------------------------------------------
+-- Нумерация строк
+--------------------------------------------------
+map("n", "<leader>nn", "<cmd>set nu!<CR>", { desc = "Переключить номера строк" })
+map("n", "<leader>nr", "<cmd>set rnu!<CR>", { desc = "Переключить относительные номера" })
 
--- Сброс подсветки поиска
-map("n", "<Esc>", "<cmd>noh<CR>", { desc = "general clear highlights" })
-
--- Работа с файлом
-map("n", "<C-s>", "<cmd>w<CR>", { desc = "general save file" })
-map("n", "<C-c>", "<cmd>%y+<CR>", { desc = "general copy whole file" })
-
--- Переключение нумерации
-map("n", "<leader>nn", "<cmd>set nu!<CR>", { desc = "toggle line number" })
-map("n", "<leader>nr", "<cmd>set rnu!<CR>", { desc = "toggle relative number" })
-
+--------------------------------------------------
 -- Комментирование
-map("n", "<leader>/", "gcc", { desc = "toggle comment", remap = true })
-map("v", "<leader>/", "gc", { desc = "toggle comment", remap = true })
+--------------------------------------------------
+map("n", "<leader>/", "gcc", { desc = "Комментировать строку", remap = true })
+map("v", "<leader>/", "gc", { desc = "Комментировать выделение", remap = true })
 
-
+--------------------------------------------------
 -- nvim-tree
-map("n", "<C-n>", "<cmd>NvimTreeToggle<CR>", { desc = "nvimtree toggle window" })
-map("n", "<leader>t", "<cmd>NvimTreeFocus<CR>", { desc = "nvimtree focus window" })
+--------------------------------------------------
+map("n", "<C-n>", "<cmd>NvimTreeToggle<CR>", { desc = "Дерево файлов: открыть/закрыть" })
+map("n", "<leader>t", "<cmd>NvimTreeFocus<CR>", { desc = "Дерево файлов: фокус" })
 
-
--- telescope
-map("n", "<leader>ff", "<cmd>Telescope find_files<cr>", { desc = "telescope find files" })
-map("n", "<leader>ft", "<cmd>Telescope live_grep<CR>", { desc = "telescope live grep" })
-map("n", "<leader>fb", "<cmd>Telescope buffers<CR>", { desc = "telescope find buffers" })
-map("n", "<leader>fh", "<cmd>Telescope help_tags<CR>", { desc = "telescope help page" })
-map("n", "<leader>fo", "<cmd>Telescope oldfiles<CR>", { desc = "telescope find oldfiles" })
-map("n", "<leader>fz", "<cmd>Telescope current_buffer_fuzzy_find<CR>", { desc = "telescope find in current buffer" })
+--------------------------------------------------
+-- Telescope
+--------------------------------------------------
+map("n", "<leader>ff", "<cmd>Telescope find_files<CR>", { desc = "Файлы" })
+map("n", "<leader>ft", "<cmd>Telescope live_grep<CR>", { desc = "Поиск по тексту" })
+map("n", "<leader>fb", "<cmd>Telescope buffers<CR>", { desc = "Буферы" })
+map("n", "<leader>fh", "<cmd>Telescope help_tags<CR>", { desc = "Справка" })
+map("n", "<leader>fo", "<cmd>Telescope oldfiles<CR>", { desc = "Недавние файлы" })
+map("n", "<leader>fz", "<cmd>Telescope current_buffer_fuzzy_find<CR>", { desc = "Поиск в текущем буфере" })
 map(
   "n",
   "<leader>fa",
   "<cmd>Telescope find_files follow=true no_ignore=true hidden=true<CR>",
-  { desc = "telescope find all files" }
+  { desc = "Все файлы (включая скрытые и ignored)" }
 )
+map("n", "<leader>fm", "<cmd>Telescope marks<CR>", { desc = "Метки" })
 
-map("n", "<leader>fm", "<cmd>Telescope marks<CR>", { desc = "telescope find marks" })
-map("n", "<leader>gc", "<cmd>Telescope git_commits<CR>", { desc = "telescope git commits" })
-map("n", "<leader>gs", "<cmd>Telescope git_status<CR>", { desc = "telescope git status" })
-map("n", "<leader>gb", "<cmd>Telescope git_branches<CR>", { desc = "telescope git branches" })
--- map("n", "<leader>pt", "<cmd>Telescope terms<CR>", { desc = "telescope pick hidden term" })
+map("n", "<leader>gc", "<cmd>Telescope git_commits<CR>", { desc = "Git: коммиты" })
+map("n", "<leader>gs", "<cmd>Telescope git_status<CR>", { desc = "Git: статус" })
+map("n", "<leader>gb", "<cmd>Telescope git_branches<CR>", { desc = "Git: ветки" })
 
--- map("n", "<leader>cs", "<cmd>Telescope colorscheme<CR>", { desc = "telescope themes" })
-vim.keymap.set("n", "<leader>cs", function()
-    require("telescope.builtin").colorscheme({ enable_preview = true })
-end, { desc = "telescope colorscheme with preview" })
+map("n", "<leader>cs", function()
+  require("telescope.builtin").colorscheme({ enable_preview = true })
+end, { desc = "Цветовые схемы" })
 
+--------------------------------------------------
+-- Bufferline
+--------------------------------------------------
+map("n", "<Tab>", "<cmd>BufferLineCycleNext<CR>", { desc = "Следующий буфер" })
+map("n", "<S-Tab>", "<cmd>BufferLineCyclePrev<CR>", { desc = "Предыдущий буфер" })
 
--- bufferline
--- Переключение между буферами
-map("n", "<Tab>", "<Cmd>BufferLineCycleNext<CR>", { desc = "Следующий буфер" })
-map("n", "<S-Tab>", "<Cmd>BufferLineCyclePrev<CR>", { desc = "Предыдущий буфер" })
+map("n", "<leader>bn", "<cmd>enew<CR>", { desc = "Новый буфер" })
+map("n", "<leader>bc", "<cmd>BufferLinePickClose<CR>", { desc = "Закрыть выбранный буфер" })
+map(
+  "n",
+  "<leader>bC",
+  "<cmd>BufferLineCloseLeft<CR><cmd>BufferLineCloseRight<CR>",
+  { desc = "Закрыть все буферы, кроме текущего" }
+)
+map("n", "<leader>bl", "<cmd>BufferLineMoveNext<CR>", { desc = "Переместить буфер вправо" })
+map("n", "<leader>bh", "<cmd>BufferLineMovePrev<CR>", { desc = "Переместить буфер влево" })
+map("n", "<leader>bp", "<cmd>BufferLinePick<CR>", { desc = "Выбрать буфер" })
+map("n", "<leader>bs", "<cmd>BufferLineSortByTabs<CR>", { desc = "Сортировать буферы по вкладкам" })
 
--- Закрытие буферов
-map("n", "<leader>b", "<cmd>enew<CR>", { desc = "buffer new" })
-map("n", "<leader>bc", "<Cmd>BufferLinePickClose<CR>", { desc = "Закрыть выбранный буфер" })
-map("n", "<leader>bC", "<Cmd>BufferLineCloseLeft<CR><Cmd>BufferLineCloseRight<CR>", { desc = "Закрыть все буферы, кроме текущего" })
+for i = 1, 9 do
+  map("n", "<leader>b" .. i, ("<cmd>BufferLineGoToBuffer %d<CR>"):format(i), { desc = "Буфер " .. i })
+end
 
--- Перемещение буферов
-map("n", "<leader>bl", "<Cmd>BufferLineMoveNext<CR>", { desc = "Переместить буфер вправо" })
-map("n", "<leader>bh", "<Cmd>BufferLineMovePrev<CR>", { desc = "Переместить буфер влево" })
-
--- Выбор буфера по номеру
-map("n", "<leader>b1", "<Cmd>BufferLineGoToBuffer 1<CR>", { desc = "Перейти к буферу 1" })
-map("n", "<leader>b2", "<Cmd>BufferLineGoToBuffer 2<CR>", { desc = "Перейти к буферу 2" })
-map("n", "<leader>b3", "<Cmd>BufferLineGoToBuffer 3<CR>", { desc = "Перейти к буферу 3" })
-map("n", "<leader>b4", "<Cmd>BufferLineGoToBuffer 4<CR>", { desc = "Перейти к буферу 4" })
-map("n", "<leader>b5", "<Cmd>BufferLineGoToBuffer 5<CR>", { desc = "Перейти к буферу 5" })
-map("n", "<leader>b6", "<Cmd>BufferLineGoToBuffer 6<CR>", { desc = "Перейти к буферу 6" })
-map("n", "<leader>b7", "<Cmd>BufferLineGoToBuffer 7<CR>", { desc = "Перейти к буферу 7" })
-map("n", "<leader>b8", "<Cmd>BufferLineGoToBuffer 8<CR>", { desc = "Перейти к буферу 8" })
-map("n", "<leader>b9", "<Cmd>BufferLineGoToBuffer 9<CR>", { desc = "Перейти к буферу 9" })
-
--- Выбор буфера через меню
-map("n", "<leader>bp", "<Cmd>BufferLinePick<CR>", { desc = "Выбрать буфер из списка" })
-
--- Сортировка буферов
-map("n", "<leader>bs", "<Cmd>BufferLineSortByTabs<CR>", { desc = "Сортировать буферы по вкладкам" })
-
+--------------------------------------------------
 -- Вкладки
-map("n", "<leader>wn", "<Cmd>tabnew<CR>", { desc = "Новая вкладка" })
-map("n", "<leader>wc", "<Cmd>tabclose<CR>", { desc = "Закрыть вкладку" })
-map("n", "<leader>wj", "<Cmd>tabnext<CR>", { desc = "Следующая вкладка" })
-map("n", "<leader>wk", "<Cmd>tabprev<CR>", { desc = "Предыдущая вкладка" })
+--------------------------------------------------
+map("n", "<leader>wn", "<cmd>tabnew<CR>", { desc = "Новая вкладка" })
+map("n", "<leader>wc", "<cmd>tabclose<CR>", { desc = "Закрыть вкладку" })
+map("n", "<leader>wj", "<cmd>tabnext<CR>", { desc = "Следующая вкладка" })
+map("n", "<leader>wk", "<cmd>tabprev<CR>", { desc = "Предыдущая вкладка" })
 
--- terminal
-map("t", "<C-x>", "<C-\\><C-N>", { desc = "terminal escape terminal mode" })
-map('n', '<leader>sf', '<cmd>ToggleTerm direction=float<CR>', { desc = "" })
-map('n', '<leader>sh', '<cmd>ToggleTerm direction=horizontal<CR>', { desc = "" })
-map('n', '<leader>sv', '<cmd>ToggleTerm direction=vertical<CR>', { desc = "" })
-map('n', '<leader>sc', '<cmd>ToggleTermToggleAll<CR>', { desc = "" })
-
-
-    --
-    -- -- Навигация по изменениям
-    -- vim.keymap.set("n", "]h", function() gs.nav_hunk("next") end, { desc = "Next hunk" })
-    -- vim.keymap.set("n", "[h", function() gs.nav_hunk("prev") end, { desc = "Prev hunk" })
-    --
-    -- -- Действия с хунками (внутри hunk-а)
-    -- vim.keymap.set("n", "<leader>hs", gs.stage_hunk,  { desc = "Stage hunk" })
-    -- vim.keymap.set("n", "<leader>hr", gs.reset_hunk,  { desc = "Reset hunk" })
-    -- vim.keymap.set("n", "<leader>hp", gs.preview_hunk,{ desc = "Preview hunk" })
-    -- vim.keymap.set("n", "<leader>hb", function() gs.blame_line({ full = true }) end,
-    --   { desc = "Blame line" })
-    --
-    -- -- Действия с буфером
-    -- vim.keymap.set("n", "<leader>hS", gs.stage_buffer, { desc = "Stage buffer" })
-    -- vim.keymap.set("n", "<leader>hR", gs.reset_buffer, { desc = "Reset buffer" })
-    -- vim.keymap.set("n", "<leader>hu", gs.undo_stage_hunk, { desc = "Undo stage hunk" })
-    --
+--------------------------------------------------
+-- Терминал
+--------------------------------------------------
+map("t", "<C-x>", "<C-\\><C-N>", { desc = "Выйти из режима терминала" })
+map("n", "<leader>sf", "<cmd>ToggleTerm direction=float<CR>", { desc = "Терминал: float" })
+map("n", "<leader>sh", "<cmd>ToggleTerm direction=horizontal<CR>", { desc = "Терминал: снизу" })
+map("n", "<leader>sv", "<cmd>ToggleTerm direction=vertical<CR>", { desc = "Терминал: справа" })
+map("n", "<leader>sc", "<cmd>ToggleTermToggleAll<CR>", { desc = "Терминал: закрыть все" })

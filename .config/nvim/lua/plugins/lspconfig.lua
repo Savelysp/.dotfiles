@@ -1,17 +1,23 @@
 return {
   {
     "neovim/nvim-lspconfig",
+    dependencies = { "hrsh7th/cmp-nvim-lsp" },
     event = { "BufReadPre", "BufNewFile" },
     config = function()
-      -- Capabilities для nvim-cmp
-      local capabilities = vim.lsp.protocol.make_client_capabilities()
-      capabilities = require("cmp_nvim_lsp").default_capabilities(capabilities)
-
-      vim.lsp.config("*", {
-        capabilities = capabilities,
+      -- Единый вид диагностики для всех серверов
+      vim.diagnostic.config({
+        virtual_text = { spacing = 2, prefix = "●" },
+        severity_sort = true,
+        update_in_insert = false,
+        float = { border = "rounded", source = true },
       })
 
-      -- Python
+      -- Capabilities для nvim-cmp
+      vim.lsp.config("*", {
+        capabilities = require("cmp_nvim_lsp").default_capabilities(),
+      })
+
+      -- Python: pyright
       vim.lsp.config("pyright", {
         settings = {
           pyright = {
@@ -26,8 +32,9 @@ return {
             },
           },
         },
-      })     
+      })
 
+      -- Python: ruff
       vim.lsp.config("ruff", {
         init_options = {
           settings = {
@@ -40,49 +47,41 @@ return {
         },
       })
 
-    -- require("lsp_signature").setup({
-    --   bind = true,
-    --   handler_opts = { border = "rounded" },
-    -- })
+      -- Единственное место, где перечислены включённые серверы
+      vim.lsp.enable({
+        "pyright",
+        "ruff",
+        "rust_analyzer",
+      })
 
-      -- Активация сервера
-      vim.lsp.enable("pyright")
-      vim.lsp.enable("ruff")
+      -- Диагностика
+      vim.keymap.set("n", "<leader>le", vim.diagnostic.open_float, { desc = "Показать диагностику" })
+      vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, { desc = "Предыдущая диагностика" })
+      vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { desc = "Следующая диагностика" })
 
-      -- 4. Глобальные маппинги диагностики
-      vim.keymap.set("n", "<space>e", vim.diagnostic.open_float, { desc = "Show diagnostics" })
-      vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, { desc = "Prev diagnostic" })
-      vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { desc = "Next diagnostic" })
-
-      -- 5. Маппинги LSP при подключении к буферу
+      -- Маппинги LSP при подключении к буферу
       vim.api.nvim_create_autocmd("LspAttach", {
-        group = vim.api.nvim_create_augroup("UserLspConfig", {}),
+        group = vim.api.nvim_create_augroup("UserLspConfig", { clear = true }),
         callback = function(ev)
-          local opts = { buffer = ev.buf }
-          vim.keymap.set("n", "lD", vim.lsp.buf.declaration, opts)
-          vim.keymap.set("n", "ld", vim.lsp.buf.definition, opts)
-          vim.keymap.set("n", "lk", vim.lsp.buf.hover, opts)
-          vim.keymap.set("n", "li", vim.lsp.buf.implementation, opts)
-          vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
-          vim.keymap.set({ "n", "v" }, "<space>r", vim.lsp.buf.code_action, opts)
-          vim.keymap.set("n", "<space>f", function()
-            vim.lsp.buf.format({ async = true })
-          end, opts)
+          local map = function(lhs, rhs, desc)
+            vim.keymap.set("n", lhs, rhs, { buffer = ev.buf, desc = desc })
+          end
+
+          map("<leader>ld", vim.lsp.buf.definition, "Определение")
+          map("<leader>lD", vim.lsp.buf.declaration, "Объявление")
+          map("<leader>lh", vim.lsp.buf.hover, "Подсказка")
+          map("<leader>li", vim.lsp.buf.implementation, "Реализации")
+          map("<leader>lr", vim.lsp.buf.references, "Ссылки")
+          map("<leader>lf", function()
+            vim.lsp.buf.format({ timeout_ms = 2000 })
+          end, "Форматировать")
+
+          vim.keymap.set({ "n", "v" }, "<leader>la", vim.lsp.buf.code_action, {
+            buffer = ev.buf,
+            desc = "Code action",
+          })
         end,
       })
-      --
-      -- -- Хоткеи при подключении LSP
-      -- vim.api.nvim_create_autocmd("LspAttach", {
-      --   group = vim.api.nvim_create_augroup("UserLspConfig", {}),
-      --   callback = function(ev)
-      --     local opts = { buffer = ev.buf }
-      --     vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
-      --     vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
-      --     vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
-      --     vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, opts)
-      --     vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
-      --   end,
-      -- })
     end,
   },
 }
