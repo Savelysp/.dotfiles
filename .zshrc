@@ -1,46 +1,119 @@
+# =============================================================================
+# .zshrc — конфигурация Zsh
+# =============================================================================
+
+# =============================================================================
+# 1. ПРОМПТ И ПЕРЕМЕННЫЕ
+# =============================================================================
+
+# Starship — кросс-shell промпт с поддержкой множества языков/инструментов
 eval "$(starship init zsh)"
 
+# Zoxide — умная замена `cd`: запоминает, куда ты чаще ходишь
 eval "$(zoxide init zsh)"
 
-alias emacs="emacsclient -c -a 'emacs'"
-# alias ls="ls --color=tty"
-alias ls="eza --icons=always"
-alias cat="bat"
-alias enw="emacs -nw"
-alias n="nvim"
-alias cl="clear"
-
-alias nixreb="sudo nixos-rebuild switch --flake /home/ifmund/nixos-configs"
-
-#HISTSIZE=10000
-#SAVEHIST=10000
-#HISTFILE=~/.zhistory
-#HISTDUP=erase
-#setopt sharehistory
-
-#DISABLE_AUTO_TITLE="true"
+# Редактор по умолчанию
 export EDITOR=nvim
 
-#autoload -U colors && colors
+# Отключить автозаголовок терминала (освобождает одну строку)
+DISABLE_AUTO_TITLE="true"
 
-#autoload -U compinit
-#zstyle ':completion:*' menu select
-#zmodload zsh/complist
-#compinit
-#_comp_options+=(globdots)
+# =============================================================================
+# 2. АЛИАСЫ
+# =============================================================================
 
-#bindkey -v
-#export KEYTIMEOUT=1
+# Emacs
+# alias emacs="emacsclient -c -a 'emacs'"    # GUI-клиент
+# alias emdaemon="emacs --daemon"              # Запустить фоновый демон
+# alias enw="emacs -nw"                        # Emacs в терминале (no-window)
 
-#bindkey -M menuselect 'h' vi-backward-char
-#bindkey -M menuselect 'k' vi-up-line-or-history
-#bindkey -M menuselect 'l' vi-forward-char
-#bindkey -M menuselect 'j' vi-down-line-or-history
-#bindkey -v '^?' backward-delete-char
+# Файловые утилиты
+alias ls="eza --icons=always"               # Красивый ls с иконками
+alias cat="bat"                              # Bat с подсветкой синтаксиса и git-статусом
 
-#export PATH=/home/ifmund/.local/bin:/home/ifmund/.config/emacs/bin:/home/ifmund/.ghcup/hls/2.9.0.1/bin:/home/ifmund/.nix-profile/bin:$PATH
+# Навигация и утилиты
+alias n="nvim"                               # Быстрый запуск neovim
+alias cl="clear"                             # Очистка экрана
 
-#source ~/.zsh-plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
-#source ~/.zsh-plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+# NixOS
+alias nixreb="sudo nixos-rebuild switch --flake /home/ifmund/.nixos-configs"
 
-#[ -f "/home/ifmund/.ghcup/env" ] && . "/home/ifmund/.ghcup/env" # ghcup-env
+# =============================================================================
+# 3. ИСТОРИЯ (HISTORY)
+# =============================================================================
+
+# Размер хранилища и файла истории
+HISTSIZE=10000
+SAVEHIST=10000
+HISTFILE=~/.zhistory
+
+# Удалять дубликаты из истории (сохраняем только последнее вхождение)
+HISTDUP=erase
+
+# Делить историю между всеми сессиями (команды видны сразу)
+setopt sharehistory
+
+# =============================================================================
+# 4. COMPLETION (АВТОДОПОЛНЕНИЕ)
+# ===
+
+# Загрузить систему дополнений
+autoload -U compinit
+compinit
+
+# Выделить найденные варианты в меню автодополнения
+zstyle ':completion:*' menu select
+
+# Включить globdots — автодополнение скрытых файлов (dotfiles)
+_comp_options+=(globdots)
+
+# =============================================================================
+# 5. VI KEYBINDINGS
+# ===
+
+# Включить vi-режим ввода (навигация как в vim)
+bindkey -v
+
+# Del = backward-delete-char (исправление backspace)
+bindkey -v '^?' backward-delete-char
+
+# =============================================================================
+# 6. ПОЛЕЗНЫЕ OPTS (поведение shell)
+# =============================================================================
+
+# Автопереход в каталог: `cd /some/path` без пробела
+setopt AUTO_CD
+
+# Не спрашивать подтверждение при перезаписи файлов редиректом
+setopt NO_CLOBBER
+
+# Расширять glob-паттерны (например, `*.txt` найдёт в подкаталогах с **
+setopt GLOB_DOTS
+
+# Убирать / в конце пути при auto_cd
+setopt AUTO_PARAM_SLASH
+
+# Подсвечивать несуществующие файлы при нажатии Tab (вместо тишины)
+setopt NO_NOMATCH
+
+# =============================================================================
+# 7. ДОПОЛНИТЕЛЬНЫЕ УТИЛИТЫ
+# =============================================================================
+
+# Умный grep с подсветкой
+alias grep="grep --color=auto"
+alias fgrep="fgrep --color=auto"
+alias egrep="egrep --color=auto"
+
+# Безопасное удаление (подтверждение для rm -r)
+alias rm="rm -I"        # Спрашивать перед удалением >3 файлов
+
+# Быстрая навигация по каталогам (pushd/popd/dirstack)
+alias ..="cd .."
+alias ...="cd ../.."
+alias ....="cd ../../.."
+alias .....="cd ../../../.."
+
+# Плагины: автоподсказки команд и подсветка синтаксиса
+source ~/.zsh-plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+source ~/.zsh-plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
