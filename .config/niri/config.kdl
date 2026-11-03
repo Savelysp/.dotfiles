@@ -98,6 +98,7 @@ prefer-no-csd
 
 // Панель waybar
 spawn-at-startup "waybar"
+spawn-at-startup "mako"
 
 // Обои
 spawn-at-startup "awww-daemon"
