@@ -71,6 +71,8 @@
     nodejs
    
     # Term
+    tmux
+    zellij
     alacritty  # Terminal emulator
     ueberzugpp # Image support
     starship   # Shell prompt
