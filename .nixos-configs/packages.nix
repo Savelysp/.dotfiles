@@ -11,11 +11,12 @@
     fuzzel
     awww
     waybar
+    mako
     wl-clipboard
     xwayland-satellite
 
     # AI
-    llama-cpp
+    llama-cpp-rocm
 
     # Desktop
     telegram-desktop
@@ -24,6 +25,7 @@
     spotify
     mpv
     zathura
+    obsidian
 
     # CLI 
     btop    # Better top
@@ -38,6 +40,14 @@
 
     # Useless CLI
     fastfetch  # Best fetch
+    cbonsai
+    lavat
+    pipes-rs
+    cmatrix
+    mapscii
+    tty-clock
+    globe-cli
+    cava
 
     # Network
     wget    # Downoader
