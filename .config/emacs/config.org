@@ -1,702 +1,750 @@
 #+TITLE: IF_mund's GNU Emacs Config
 #+AUTHOR: Savelysp (IF_mund)
-#+DESCRIPTION: IF_mund's personal Emacs config — notes, code, and IDE workflow.
-#+STARTUP: content
+#+DESCRIPTION: IF_mund's personal Emacs config
+#+STARTUP: overview
 #+OPTIONS: toc:2
 
-* Package Management
-  :PROPERTIES:
-  :CUSTOM_ID: package-management
-  :END:
-
-  Initialize package archives and enable /use-package/ for declarative setup.
-
+* Package management
 #+begin_src emacs-lisp
-(require 'package)
+  ;; Инициализация менеджера пакетов.
+  (require 'package)
+  (setq package-archives '(("melpa" . "https://melpa.org/packages/")
+                           ("nongnu" . "https://elpa.nongnu.org/nongnu/")
+                           ("elpa" . "https://elpa.gnu.org/packages/")
+                           ("org" . "https://orgmode.org/elpa/")))
+  (package-initialize)
+  (unless package-archive-contents
+    (package-refresh-contents))
 
-;; Package archives
-(setq package-archives
-      '(("melpa"  . "https://melpa.org/packages/")
-        ("elpa"   . "https://elpa.gnu.org/packages/")
-        ("org"    . "https://orgmode.org/elpa/")))
+  ;; Гарантия наличия use-package
+  (unless (package-installed-p 'use-package)
+    (package-install 'use-package))
+  (eval-when-compile (require 'use-package))
 
-(package-initialize)
-(unless package-archive-contents
-  (package-refresh-contents))
-
-;; Ensure use-package is available
-(unless (package-installed-p 'use-package)
-  (package-install 'use-package))
-(eval-when-compile (require 'use-package))
-
-;; Automatically install packages when declared
-(setq use-package-always-ensure t)
+  ;; Автоматически устанавливать пакеты при объявлении
+  (setq use-package-always-ensure t)
 #+end_src
 
-* Base Config
-  :PROPERTIES:
-  :CUSTOM_ID: base-config
-  :END:
-
-  Core UI settings: hide chrome, adjust transparency, control indentation.
-
+* Base settings
+** Interface
 #+begin_src emacs-lisp
-;; Hide UI chrome
-(setq inhibit-startup-message t) ;; Disable startup message
-(scroll-bar-mode -1)             ;; Disable visible scrollbar
-(tool-bar-mode -1)               ;; Disable toolbar
-(tooltip-mode -1)                ;; Disable tooltips
-(menu-bar-mode -1)               ;; Disable menu bar
+  ;; Скрыть элементы интерфейса
+  (setq inhibit-startup-message t) ;; Отключить приветственное сообщение
+  (scroll-bar-mode -1)             ;; Скрыть полосу прокрутки
+  (tool-bar-mode -1)               ;; Скрыть панель инструментов
+  (tooltip-mode -1)                ;; Отключить всплывающие подсказки
+  (menu-bar-mode -1)               ;; Скрыть строку меню
 
-(set-fringe-mode 4)              ;; Reduce fringe space
+  (blink-cursor-mode -1)           ;; Отключить мигание курсора
+  (set-fringe-mode 4)              ;; Уменьшить отступы по краям
 
-;; Transparency
-(set-frame-parameter nil 'alpha-background 95)
-(add-to-list 'default-frame-alist '(alpha-background . 95))
+  ;; Курсор не виден в неактивных окнах
+  ;; Не сжимать шрифтовые кэши — ускоряет переключение шрифтов
+  (setq cursor-in-non-selected-windows nil
+        inhibit-compacting-font-caches t)
 
-;; Indentation defaults
-(setq-default indent-tabs-mode nil)
-(setq-default tab-width 4)
+  ;; Заголовок окна: имя файла (dired-путь), иначе имя буфера
+  (setq frame-title-format
+        '((buffer-file-name "%f" (dired-directory dired-directory "%b"))
+          " — Emacs"))
 #+end_src
 
-* Line Numbers & Scrolling
-  :PROPERTIES:
-  :CUSTOM_ID: line-numbers-and-scrolling
-  :END:
-
-  Enable relative line numbers everywhere except terminal-like buffers.
-  Smooth scrolling is currently disabled (TODO: revisit).
-
+** Transparent
 #+begin_src emacs-lisp
-(column-number-mode)
-(global-display-line-numbers-mode t)
-(setq display-line-numbers-type 'relative)
-
-;; Hide line numbers in special buffers
-(dolist (mode '(term-mode-hook
-                shell-mode-hook
-                eshell-mode-hook
-                org-mode-hook
-                visual-fill-column-mode-hook))
-  (add-hook mode (lambda () (display-line-numbers-mode 0))))
-
-;; Smooth scroll — temporarily disabled
-;; (setq redisplay-dont-pause t
-;;       scroll-margin 1
-;;       scroll-step 1
-;;       scroll-conservatively 10000
-;;       scroll-preserve-screen-position 1)
-;; (setq pixel-scroll-precision-large-scroll-height 40.0)
-;; (setq mouse-wheel-scroll-amount '(1 ((shift) . 1)))
-;; (setq mouse-wheel-progressive-speed nil)
-;; (setq mouse-wheel-follow-mouse t)
-;; (setq scroll-step 1)
+  ;; Прозрачность фона
+  ;; (set-frame-parameter nil 'alpha-background 95)
+  ;; (add-to-list 'default-frame-alist '(alpha-background . 95))
 #+end_src
 
-* Keybindings
-  :PROPERTIES:
-  :CUSTOM_ID: keybindings
-  :END:
-
-  Global keybindings that apply across all modes.
-
+** Indents
 #+begin_src emacs-lisp
-;; ESC quickly dismisses prompts and overlays
-(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
-
-;; Initial buffer choice (optional)
-;; (setq initial-buffer-choice "~/.config/emacs/start.org")
+  ;; Настройки отступов по умолчанию
+  (setq-default indent-tabs-mode nil)
+  (setq-default tab-width 4)
 #+end_src
 
-* UI & Appearance
-  :PROPERTIES:
-  :CUSTOM_ID: ui-and-appearance
-  :END:
-
-  Themes, modeline, icons, and visual polish.
-
-** Doom Modeline
-  :PROPERTIES:
-  :CUSTOM_ID: doom-modeline
-  :END:
-
-  Lightweight, information-rich mode line replacement.
-
+** Line numbers
 #+begin_src emacs-lisp
-(use-package doom-modeline
-  :init (doom-modeline-mode 1))
+  ;; Отображение номеров строк
+  (column-number-mode)
+  (global-display-line-numbers-mode t)
+  (setq display-line-numbers-type 'relative)
+
+  ;; Отключить номера строк в режимах, где они не нужны:
+  (dolist (mode '(term-mode-hook
+                  shell-mode-hook
+                  help-mode-hook
+                  dired-mode-hook
+                  eshell-mode-hook
+                  org-mode-hook 
+                  visual-fill-column-mode-hook))
+    (add-hook mode (lambda () (display-line-numbers-mode 0))))
 #+end_src
 
-** Doom Themes
-  :PROPERTIES:
-  :CUSTOM_ID: doom-themes
-  :END:
-
-  Official Doom Emacs colour themes.
-
+** Scroll
 #+begin_src emacs-lisp
-(use-package doom-themes
-  :config
-  (load-theme 'doom-monokai-pro t))
-;; Other options (commented out):
-;; (load-theme 'doom-material t)
-;; (load-theme 'doom-nord t)
-;; (load-theme 'doom-tokyo-night t)
-;; (load-theme 'doom-gruvbox t)
-;; (load-theme 'doom-solarized-dark t)
-;; (load-theme 'doom-dracula t)
+  ;; Настройки плавности прокрутки:
+  (setq scroll-conservatively 101   ;; не прокручивать, если курсор в пределах 101 строки
+        redisplay-dont-pause t      ;; убрать задержку перерисовки (нет мерцания)
+        scroll-margin 4             ;; держать курсор на расстоянии 4 строк от края окна
+        scroll-step 1               ;; построчная прокрутка (1 строка за раз)
+        scroll-error-top-bottom t)  ;; не прокручивать за пределы буфера
 #+end_src
 
-** All-the-Icons
-  :PROPERTIES:
-  :CUSTOM_ID: all-the-icons
-  :END:
-
-  Icon set for Dashboard and other UI elements.
-
+* Style
+** Fonts
 #+begin_src emacs-lisp
-(use-package all-the-icons)
-;; Run: M-x all-the-icons-install-fonts
+  (defconst my/font-family "JetBrainsMono Nerd Font"
+  "Основной моноширинный шрифт.")
+
+  (when (member my/font-family (font-family-list))
+    ;; Шрифт по умолчанию
+    (set-face-attribute 'default nil
+      :family my/font-family
+      :height 110)
+    ;; Для фиксированной ширины
+    (set-face-attribute 'fixed-pitch nil
+      :family my/font-family)
+    ;; Для переменной ширины
+    (set-face-attribute 'variable-pitch nil
+      :family "DejaVu Sans"
+      :height 1.1))
 #+end_src
 
-** Rainbow Delimiters
-  :PROPERTIES:
-  :CUSTOM_ID: rainbow-delimiters
-  :END:
-
-  Highlights nested parentheses, brackets, and braces in different colours.
-
+** Doom themes
 #+begin_src emacs-lisp
-(use-package rainbow-delimiters
-  :hook (prog-mode . rainbow-delimiters-mode))
+  (use-package doom-themes
+    :config
+    (load-theme 'doom-monokai-pro t))
 #+end_src
 
-** Centered Cursor
-  :PROPERTIES:
-  :CUSTOM_ID: centered-cursor
-  :END:
-
-  Keeps the cursor vertically centred in the window for focus.
-
+** Doom modeline
 #+begin_src emacs-lisp
-(use-package centered-cursor-mode
-  :demand
-  :config (global-centered-cursor-mode))
+  (use-package doom-modeline
+    :init (doom-modeline-mode 1))
 #+end_src
 
-** Page Break Lines
-  :PROPERTIES:
-  :CUSTOM_ID: page-break-lines
-  :END:
-
-  Adds a subtle horizontal rule between buffers to reduce clutter.
-
+** All the icons
 #+begin_src emacs-lisp
-(use-package page-break-lines)
+  (use-package all-the-icons)
+  ;; M-x all-the-icons-install-fonts
 #+end_src
 
 ** Dashboard
-  :PROPERTIES:
-  :CUSTOM_ID: dashboard
-  :END:
-
-  Customisable splash screen with recent files, projects, and bookmarks.
-
 #+begin_src emacs-lisp
-(use-package dashboard
+  (use-package dashboard
+    :init
+    ;; Открывать dashboard при запуске
+    (setq initial-buffer-choice 'dashboard-open)
+    ;; Иконки для заголовков и файлов
+    (setq dashboard-set-heading-icons t)
+    (setq dashboard-set-file-icons t)
+    ;; Центрирование контента
+    (setq dashboard-center-content t)
+    (setq dashboard-vertically-center-content t)
+    ;; Элементы dashboard
+    (setq dashboard-items '((recents . 5)
+                            (agenda . 5 )
+                            (bookmarks . 3)
+                            (projects . 3)))
+    ;; ASCII-баннер при старте (1 = стандартный баннер Emacs)
+    (setq dashboard-startup-banner 1)
+    :config
+    ;; Подключить dashboard при запуске Emacs
+    (dashboard-setup-startup-hook))
+#+end_src
+
+* Org mode
+** Base settings
+#+begin_src emacs-lisp
+  ;; Директория для всех Org-файлов (~ /org/)
+  (defconst my/org-dir (expand-file-name "~/org")
+    "Каталог с Org-файлами.")
+  ;; Создать структуру если отсутствует
+  (make-directory my/org-dir t)
+  (make-directory (expand-file-name "roam" my/org-dir) t)
+
+  (use-package org
+    :ensure nil
+    :bind (("C-c a" . org-agenda)
+           ("C-c c" . org-capture)
+           ("C-c l" . org-store-link))
+    :hook
+    ;; Автоперенос строк в Org-буферах
+    (org-mode . visual-line-mode)
+    :config
+    ;; Экспорт в Markdown
+    (require 'ox-md)
+
+    ;; Шаблоны быстрой вставки (org-tempo):
+    (require 'org-tempo)
+    (setq
+      org-structure-template-alist
+   '(
+     ("C" . "comment")
+     ("e" . "example")
+     ("q" . "quote")
+     ("v" . "verse")
+
+     ("el"   . "src emacs-lisp")
+     ("cc"   . "src c")
+     ("hs"   . "src haskell")
+     ("jv"   . "src java")
+     ("lua"  . "src lua")
+     ("sh"   . "src shell")
+     ("sql"  . "src sql")
+     ("toml" . "src toml")
+     ("yml"  . "src yaml")
+     ("py"   . "src python")))
+
+    ;; (setf (cdr (assoc 'file org-link-frame-setup)) 'find-file)
+
+    ;; Основные настройки Org:
+    (setq org-directory my/org-dir
+          ;; Список файлов для Agenda
+          org-agenda-files (list my/org-dir)
+          ;; Файл для заметок по умолчанию
+          org-default-notes-file (expand-file-name "inbox.org" my/org-dir)
+
+          ;; org-startup-indented t
+
+          org-startup-folded 'content         ;; Сворачивать заголовки при открытии
+          org-hide-emphasis-markers t         ;; Скрыть маркеры выделения
+          org-ellipsis " …"                   ;; Эллипсис вместо раскрытия блоков
+          org-log-done 'time                  ;; Ставить время при выполнении задачи
+          org-log-into-drawer t               ;; Лог изменений в Drawer
+          org-return-follows-link t           ;; Enter на ссылках → переход
+          ;; org-use-speed-commands t
+          ;; org-confirm-babel-evaluate nil
+
+          ;; Настройка блоков кода
+          org-src-fontify-natively t
+          org-src-tab-acts-natively t
+          org-src-preserve-indentation t
+          org-edit-src-content-indentation 0
+
+          org-image-actual-width nil          ;; Изображения на полную ширину
+          org-export-backends '(ascii html latex md)
+
+          ;; Шаблоны захвата (org-capture):
+          org-capture-templates
+          '(("t" "Задача" entry (file+headline "inbox.org" "Задачи")
+             "* TODO %?\n%U\n")
+            ("n" "Заметка" entry (file+headline "inbox.org" "Заметки")
+             "* %?\n%U\n")
+            ("j" "Дневник" entry (file+olp+datetree "journal.org")
+             "* %U %?\n"))))
+    ;; (org-babel-do-load-languages
+    ;;  'org-babel-load-languages
+    ;;  '((emacs-lisp . t) (shell . t) (python . t) (C . t))))
+#+end_src
+
+** Org modern
+#+begin_src emacs-lisp
+  (use-package org-modern
+    :after org
+    :hook (org-mode . org-modern-mode)
+    :config
+    (add-hook 'org-agenda-finalize-hook #'org-modern-agenda))
+#+end_src
+
+** Org appear 
+#+begin_src emacs-lisp
+  ;; Автопоказ маркеров выделения при навигации
+  (use-package org-appear
+    :after org
+    :hook (org-mode . org-appear-mode))
+#+end_src
+
+** Org roam + UI
+#+begin_src emacs-lisp
+  (use-package org-roam
+    :after org
+    :bind (("C-c n f" . org-roam-node-find)
+           ("C-c n i" . org-roam-node-insert)
+           ("C-c n l" . org-roam-buffer-toggle)
+           ("C-c n d" . org-roam-dailies-goto-today))
+
+    :config
+    (setq org-roam-directory (expand-file-name "roam" my/org-dir)
+          ;; Автодополнение ссылками Roam везде
+          org-roam-completion-everywhere t
+          ;; Директория для daily
+          org-roam-dailies-directory (expand-file-name "daily" my/org-dir))
+
+    (make-directory org-roam-dailies-directory t)
+    (org-roam-db-autosync-mode 1))
+
+  (use-package org-roam-ui)
+#+end_src
+
+* Evil mode
+** Evil core
+#+begin_src emacs-lisp
+  (use-package evil
+    :init
+    ;; Интеграция со стандартными режимами Emacs
+    (setq evil-want-integration t)
+    ;; Отключить авто-биндинги Vim
+    (setq evil-want-keybinding nil)
+    :config
+    (evil-mode t))
+
+  ;; Интеграция Evil с режимами Emacs
+  (use-package evil-collection
+    :after evil
+    :config
+    (evil-collection-init))
+#+end_src
+
+** Evil commenter
+#+begin_src emacs-lisp
+  ;; Vim-подобные комментарии: gc (строка), gcc (выделение)
+  (use-package evil-commentary
+    :after evil
+    :config
+    (evil-commentary-mode 1))
+#+end_src
+
+** Evil surround
+#+begin_src emacs-lisp
+  ;; Управление окружающими символами как в vim-surround
+  (use-package evil-surround
+    :after evil
+    :config
+    (global-evil-surround-mode 1))
+#+end_src
+
+** Evil org
+#+begin_src emacs-lisp
+  ;; Evil-режим для Org Mode
+  (use-package evil-org
+    :after (evil org)
+    :hook (org-mode . evil-org-mode))
+#+end_src
+
+* Keybinds
+** General
+#+begin_src emacs-lisp
+  ;; Определение лидер-клавиш
+  (use-package general
+    :after evil
+    :config
+    ;; my/leader  — глобальный, префикс
+    (general-create-definer my/leader
+      :states '(normal visual motion)
+      :keymaps 'override
+      :prefix "SPC")
+    ;; my/localleader — локальный, префикс
+    (general-create-definer my/localleader
+      :states '(normal visual motion)
+      :keymaps 'override
+      :prefix ","))
+#+end_src
+
+** Which key
+#+begin_src emacs-lisp
+  ;; Подсказки доступных команд
+  (use-package which-key
+  :ensure nil
   :init
-  (setq initial-buffer-choice 'dashboard-open)
-  (setq dashboard-set-heading-icons t)
-  (setq dashboard-set-file-icons t)
-  (setq dashboard-items '((recents  . 5)
-                          (agenda   . 5)
-                          (bookmarks . 3)
-                          (projects . 3)))
-  (setq dashboard-startup-banner 1)
-  :config
-  (dashboard-setup-startup-hook))
+  (which-key-mode 1))
 #+end_src
 
-* Navigation & Search
-  :PROPERTIES:
-  :CUSTOM_ID: navigation-and-search
-  :END:
-
-  Ivy-based fuzzy-finder suite with richer display and smart keybindings.
-
-** Ivy
-  :PROPERTIES:
-  :CUSTOM_ID: ivy
-  :END:
-
-  Core fuzzy-matching framework for minibuffer prompts.
-
+** Keybinds
 #+begin_src emacs-lisp
-(use-package ivy
-  :bind (("C-s" . swiper)
-         :map ivy-minibuffer-map
-         ("TAB" . ivy-alt-done)
-         ("C-l" . ivy-alt-done)
-         ("C-j" . ivy-next-line)
-         ("C-k" . ivy-previous-line)
-         :map ivy-switch-buffer-map
-         ("C-k" . ivy-previous-line)
-         ("C-l" . ivy-done)
-         ("C-d" . ivy-switch-buffer-kill))
-  :config (ivy-mode t))
+  (my/leader
+    "SPC" #'execute-extended-command
+    ":"   #'execute-extended-command
+
+    ;; файлы
+    "f" '(:ignore t :which-key "file")
+    "f f" #'find-file
+    "f r" #'consult-recent-file
+    "f s" #'save-buffer
+    "f d" #'dired
+
+    ;; Буферы
+    "b" '(:ignore t :which-key "buffer")
+    "b b" #'consult-buffer
+    "b k" #'kill-current-buffer
+    "b n" #'next-buffer
+    "b p" #'previous-buffer
+
+    ;; Проекты
+    "p" '(:ignore t :which-key "project")
+    "p p" #'project-switch-project
+    "p f" #'project-find-file
+    "p b" #'consult-project-buffer
+    "p k" #'project-kill-buffers
+    "p r" #'project-query-replace-regexp
+
+    ;; Поиск
+    "s" '(:ignore t :which-key "search")
+    "s l" #'consult-line
+    "s r" #'consult-ripgrep
+    "s i" #'consult-imenu
+    "s o" #'consult-outline
+
+    ;; Окна
+    "w" '(:ignore t :which-key "window")
+    "w v" #'split-window-right
+    "w s" #'split-window-below
+    "w d" #'delete-window
+    "w o" #'delete-other-windows
+    "w w" #'ace-window
+    "w u" #'winner-undo
+    "w r" #'winner-redo
+
+    ;; Git
+    "g" '(:ignore t :which-key "git")
+    "g g" #'magit-status
+    "g b" #'magit-blame
+
+    ;; Avy
+    "j" '(:ignore t :which-key "avy")
+    "j j" #'avy-goto-char-timer
+    "j l" #'avy-goto-line
+    "j w" #'avy-goto-word-1
+
+    ;; Org
+    "o" '(:ignore t :which-key "org")
+    "o a" #'org-agenda
+    "o c" #'org-capture
+    "o l" #'org-store-link
+    "o r" #'org-roam-node-find
+    "o i" #'org-roam-node-insert
+
+    ;; Терминал
+    "t" '(:ignore t :which-key "terminal")
+    "t t" #'eat
+
+    ;; AI
+    "a" '(:ignore t :which-key "ai")
+    "a g" #'gptel
+    "a s" #'gptel-send
+
+    ;; Справка
+    "h" '(:ignore t :which-key "help")
+    "h k" #'describe-key
+    "h f" #'describe-function
+    "h v" #'describe-variable
+    "h m" #'describe-mode
+    "h b" #'describe-bindings)
+
+  ;; Локальные бинды для org-mode
+  (my/localleader
+    :keymaps 'org-mode-map
+    "l" #'org-insert-link
+    "e" #'org-edit-src-code
+    "t" #'org-todo
+    "s" #'org-schedule
+    "d" #'org-deadline)
 #+end_src
 
-** Ivy Rich
-  :PROPERTIES:
-  :CUSTOM_ID: ivy-rich
-  :END:
-
-  Enhances Ivy's display with extra metadata columns.
-
+* Completion
+** Vertico
 #+begin_src emacs-lisp
-(use-package ivy-rich
-  :init (ivy-rich-mode t))
-#+end_src
-
-** Counsel
-  :PROPERTIES:
-  :CUSTOM_ID: counsel
-  :END:
-
-  Utility commands built on Ivy (switch buffers, grep, find files, etc.).
-
-#+begin_src emacs-lisp
-(use-package counsel
+  ;; Vertico — вертикальный минибуфер-список для выбора
+  (use-package vertico
   :init
-  (counsel-mode)
+  (vertico-mode 1)
   :bind
-  ("C-x b" . counsel-switch-buffer))
-;; (global-set-key (kbd "C-M-j") 'counsel-switch-buffer)
-#+end_src
-
-** Which Key
-  :PROPERTIES:
-  :CUSTOM_ID: which-key
-  :END:
-
-  Shows available keybindings after a prefix key is pressed.
-
-#+begin_src emacs-lisp
-(use-package which-key
-  :init (which-key-mode))
-#+end_src
-
-** Helpful
-  :PROPERTIES:
-  :CUSTOM_ID: helpful
-  :END:
-
-  Richer documentation for functions, commands, and variables.
-
-#+begin_src emacs-lisp
-(use-package helpful
-  :custom
-  (counsel-describe-function-function #'helpful-callable)
-  (counsel-describe-variable-function #'helpful-variable)
-  :bind
-  ([remap describe-function] . counsel-describe-function)
-  ([remap describe-command]  . helpful-command)
-  ([remap describe-variable] . counsel-describe-variable)
-  ([remap describe-key]      . helpful-key))
-#+end_src
-
-* Org Mode
-  :PROPERTIES:
-  :CUSTOM_ID: org-mode
-  :END:
-
-  Configuration for writing and managing /Org/ files — the primary note-taking workflow.
-
-** Core Org
-  :PROPERTIES:
-  :CUSTOM_ID: core-org
-  :END:
-
-  Base Org behaviour: indent mode, proportional fonts, and link handling.
-
-#+begin_src emacs-lisp
-(use-package org
-  :hook
-  (org-mode . org-indent-mode)
-  (org-mode . variable-pitch-mode)
-  (org-mode . visual-line-mode)
+  (:map
+   vertico-map
+   ("C-j" . vertico-next)             ; Следующий элемент
+   ("C-k" . vertico-previous)         ; Предыдущий элемент
+   ("C-h" . vertico-directory-up)     ; На уровень выше
+   ("C-l" . vertico-directory-enter)) ; Войти в директорию
   :config
-  (setq org-ellipsis " ▾"
-        org-hide-emphasis-markers t))
-
-;; Local files open in the current frame instead of a new one
-(setf (cdr (assoc 'file org-link-frame-setup)) 'find-file)
-
-;; Ensure fixed-pitch for code blocks, tables, and verbatim
-(set-face-attribute 'org-block    nil :foreground nil :inherit 'fixed-pitch)
-(set-face-attribute 'org-code     nil :inherit '(shadow fixed-pitch))
-(set-face-attribute 'org-table    nil :inherit '(shadow fixed-pitch))
-(set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
-(set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
-(set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
-(set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch)
+  ;; Циклическая прокрутка и расширение списка выбора
+  (setq vertico-cycle t
+        vertico-resize t))
 #+end_src
 
-** Org Bullets & Fonts
-  :PROPERTIES:
-  :CUSTOM_ID: org-bullets-and-fonts
-  :END:
-
-  Bullet styling, font scaling per level, and custom list markers.
-
+** Orderless
 #+begin_src emacs-lisp
-(use-package org-bullets
-  :after org
-  :hook (org-mode . org-bullets-mode)
-  :custom
-  (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
-
-;; Per-level font scaling (Cantarell)
-(dolist (face '((org-level-1 . 1.2)
-                (org-level-2 . 1.1)
-                (org-level-3 . 1.05)
-                (org-level-4 . 1.0)
-                (org-level-5 . 1.1)
-                (org-level-6 . 1.1)
-                (org-level-7 . 1.1)
-                (org-level-8 . 1.1)))
-  (set-face-attribute (car face) nil :font "Cantarell" :weight 'regular :height (cdr face)))
-
-;; Replace plain list hyphens with a bullet character
-(font-lock-add-keywords 'org-mode
-                        '(("^ *\\([-]\\) "
-                           (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
-#+end_src
-
-** Visual Fill Column
-  :PROPERTIES:
-  :CUSTOM_ID: visual-fill-column
-  :END:
-
-  Centers text and adds a visual column guide in Org buffers.
-
-#+begin_src emacs-lisp
-(defun efs/org-mode-visual-fill ()
-  "Enable visual-fill-column with custom settings for Org buffers."
-  (setq visual-fill-column-width 150
-        visual-fill-column-center-text t)
-  (visual-fill-column-mode 1))  ;; FIXED: was -1 (disabled)
-
-(use-package visual-fill-column
-  :hook (org-mode . efs/org-mode-visual-fill))
-#+end_src
-
-** Org Tempo
-  :PROPERTIES:
-  :CUSTOM_ID: org-tempo
-  :END:
-
-  Template snippets (e.g. /&lt;el&gt;&lt;tab&gt; → source block) for common languages.
-
-#+begin_src emacs-lisp
-(require 'org-tempo)
-(add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
-(add-to-list 'org-structure-template-alist '("py" . "src python"))
-(add-to-list 'org-structure-template-alist '("sh" . "src shell"))
-(add-to-list 'org-structure-template-alist '("lua" . "src lua"))
-(add-to-list 'org-structure-template-alist '("hs" . "src haskell"))
-(add-to-list 'org-structure-template-alist '("jv" . "src java"))
-(add-to-list 'org-structure-template-alist '("cc" . "src C"))
-(add-to-list 'org-structure-template-alist '("sq" . "src SQL"))
-#+end_src
-
-** Org Indent Helper
-  :PROPERTIES:
-  :CUSTOM_ID: org-indent-helper
-  :END:
-
-  Quick indent inside source blocks (binds to C-i).
-
-#+begin_src emacs-lisp
-(defun my-indent-org-block-automatically ()
-  "Indent the current source block and return to Org view."
-  (interactive)
-  (when (org-in-src-block-p)
-    (org-edit-special)
-    (indent-region (point-min) (point-max))
-    (org-edit-src-exit)))
-
-(define-key org-mode-map (kbd "C-i") #'my-indent-org-block-automatically)
-#+end_src
-
-** Org Roam
-  :PROPERTIES:
-  :CUSTOM_ID: org-roam
-  :END:
-
-  Bidirectional note-taking with a graph-based backlink system.
-
-#+begin_src emacs-lisp
-(use-package org-roam
-  :custom
-  (org-roam-directory "~/RoamNotes")
-  (org-roam-completion-everywhere t)
-  (org-roam-capture-templates
-   '(("d" "default"
-      plain "%?"
-      :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
-      :unnarrowed t)
-     ("p" "Project"
-      plain (file "~/RoamNotes/Templates/ProjectNoteTemplate.org")
-      :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
-      :unnarrowed t)
-     ("b" "Book note"
-      plain (file "~/RoamNotes/Templates/BookNoteTemplate.org")
-      :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
-      :unnarrowed t)))
-  :bind (("C-c n l" . org-roam-buffer-toggle)
-         ("C-c n f" . org-roam-node-find)
-         ("C-c n i" . org-roam-node-insert)
-         ("C-M-i"   . completion-at-point))
-  :config
-  (org-roam-setup))
-#+end_src
-
-** TODO: Org TODO States
-  :PROPERTIES:
-  :CUSTOM_ID: todo-org-todo-states
-  :END:
-
-  Customize workflow states (TODO, NEXT, DONE, etc.). Uncomment and adjust as needed.
-
-#+begin_src emacs-lisp
-;; (setq org-todo-keywords
-;;     '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d!)")
-;;       (sequence "PLAN(p)" "READY(r)" "ACTIVE(a)" "REVIEW(v)" "HOLD(h)" "|"
-;;                 "COMPLETED(c)" "CANC(k@)")))
-#+end_src
-
-* Development & IDE
-  :PROPERTIES:
-  :CUSTOM_ID: development-and-ide
-  :END:
-
-  Language server support, project navigation, and syntax highlighting.
-
-** Projectile
-  :PROPERTIES:
-  :CUSTOM_ID: projectile
-  :END:
-
-  Fast project-wide search, switch, and navigation.
-
-#+begin_src emacs-lisp
-(use-package projectile
-  :config
-  (projectile-mode)
-  :custom
-  (projectile-completion-system 'ivy)
-  :bind-keymap
-  ("C-c p" . projectile-command-map))
-
-;; Optionally restrict project search to a root directory:
-;; (when (file-directory-p "~/projects")
-;;   (setq projectile-project-search-path '("~/projects")))
-;; (projectile-discover-projects-in-directory "~/projects/" 1)
-;; (setq projectile-switch-project-action #'projectile-dired)
-
-;; counsel-projectile integrates with Ivy
-(use-package counsel-projectile
-  :after projectile
-  :config (counsel-projectile-mode))
-#+end_src
-
-** LSP Mode
-  :PROPERTIES:
-  :CUSTOM_ID: lsp-mode
-  :END:
-
-  Language Server Protocol integration for IDE-like features (autocomplete, go-to-definition, diagnostics).
-
-#+begin_src emacs-lisp
-(defun efs/lsp-mode-setup ()
-  "Show breadcrumb path and symbols in the headerline."
-  (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
-  (lsp-headerline-breadcrumb-mode))
-
-(use-package lsp-mode
-  :commands (lsp lsp-deferred)
+  ;; Orderless — стиль поиска: элементы выбираются в любом порядке
+  (use-package orderless
   :init
-  ;; Prefix for LSP commands
-  (setq lsp-keymap-prefix "C-c l")
-  :hook
-  ;; Enable LSP for tree-sitter-derived modes
-  (python-ts-mode . lsp-deferred)
-  (lsp-mode . efs/lsp-mode-setup)
-  ;; Which-key integration
-  (lsp-mode . lsp-enable-which-key-integration))
+  (setq completion-styles '(orderless basic)
+        completion-category-defaults nil
+        completion-category-overrides
+        '((file (styles . (partial-completion)))
+          (eglot (styles . (orderless basic))))))
 #+end_src
 
-** LSP UI
-  :PROPERTIES:
-  :CUSTOM_ID: lsp-ui
-  :END:
-
-  Enhanced UI for LSP: hover docs, diagnostics, symbols, and go-to-definition.
-
+** Marginalia
 #+begin_src emacs-lisp
-(use-package lsp-ui
-  :hook (lsp-mode . lsp-ui-mode)
-  :custom
-  (lsp-ui-doc-position 'bottom))
+  ;; Marginalia — аннотации в минибуфере
+  (use-package marginalia
+    :init
+    (marginalia-mode 1)
+    :bind (:map minibuffer-local-map
+                ("M-A" . marginalia-cycle)))
 #+end_src
 
-** LSP Ivy
-  :PROPERTIES:
-  :CUSTOM_ID: lsp-ivy
-  :END:
-
-  Ivy-based completion and symbol search for LSP.
-
+** Consult
 #+begin_src emacs-lisp
-(use-package lsp-ivy)
+  ;; Consult — мощный поиск и навигация
+  (use-package consult
+    :bind (("C-s"     . consult-line)
+           ("C-x b"   . consult-buffer)
+           ("C-x r b" . consult-bookmark)
+           ("M-g g"   . consult-goto-line)
+           ("M-g i"   . consult-imenu)
+           ("M-g o"   . consult-outline)
+           ("M-g r"   . consult-ripgrep))
+    :config
+    (setq consult-narrow-key "<"
+          consult-line-numbers-widen t
+          consult-async-min-input 2))
 #+end_src
 
-** Company & Company-Box
-  :PROPERTIES:
-  :CUSTOM_ID: company-and-company-box
-  :END:
-
-  Auto-completion framework with a polished tooltip UI.
-
+** Embark
 #+begin_src emacs-lisp
-(use-package company
-  :after lsp-mode
-  :hook (lsp-mode . company-mode)
-  :bind (:map company-active-map
-         ("<tab>" . company-complete-selection))
-        (:map lsp-mode-map
-         ("<tab>" . company-indent-or-complete-common))
-  :custom
-  (company-minimum-prefix-length 1)
-  (company-idle-delay 0.0))
+  ;; Embark — контекстные действия над объектом
+  (use-package embark
+    :bind (("C-."   . embark-act)
+           ("M-."   . embark-dwim)
+           ("C-h B" . embark-bindings))
+    :init
+    (setq prefix-help-command #'embark-prefix-help-command))
 
-(use-package company-box
-  :hook (company-mode . company-box-mode))
+  ;; Интеграция Embark + Consult: превью при навигации по коллекции
+  (use-package embark-consult
+    :after (embark consult)
+    :hook (embark-collect-mode . consult-preview-at-point-mode))
 #+end_src
 
-** DAP Mode
-  :PROPERTIES:
-  :CUSTOM_ID: dap-mode
-  :END:
-
-  Debug Adapter Protocol support for stepping through code.
-
+** Corfu + Cape
 #+begin_src emacs-lisp
-(use-package dap-mode
-  :after lsp-mode)
+  ;; Corfu — inline-дополнение прямо в тексте
+  (use-package corfu
+    :init
+    (global-corfu-mode 1)
+    (corfu-history-mode 1)
+    (corfu-popupinfo-mode 1)
+    :config
+    (setq corfu-auto t
+          corfu-auto-delay 0.15
+          corfu-auto-prefix 2
+          corfu-cycle t
+          corfu-quit-no-match 'separator
+          corfu-popupinfo-delay '(0.4 . 0.2)))
+
+  ;; Cape — дополнительные источники автодополнения
+  (use-package cape
+    :init
+    (add-hook 'completion-at-point-functions #'cape-dabbrev)
+    (add-hook 'completion-at-point-functions #'cape-file)
+    (add-hook 'completion-at-point-functions #'cape-keyword))
 #+end_src
 
-** Tree-Sitter
-  :PROPERTIES:
-  :CUSTOM_ID: tree-sitter
-  :END:
-
-  Incremental parsing for accurate syntax highlighting and indentation.
-
+* Editing
+** Pairs
 #+begin_src emacs-lisp
-;; (setq treesit-language-source-alist
-;;       '((bash  "https://github.com/tree-sitter/tree-sitter-bash")
-;;         (elisp "https://github.com/Wilfred/tree-sitter-elisp")
-;;         (python "https://github.com/tree-sitter/tree-sitter-python")))
-;; (mapc #'treesit-install-language-grammar (mapcar #'car treesit-language-source-alist))
-;;
-;; (setq major-mode-remap-alist
-;;       '((bash-mode . bash-ts-mode)
-;;         (python-mode . python-ts-mode)))
+  ;; Автоматическое закрытие пар
+  (electric-pair-mode 1)
+  ;; Подсветка парной скобки
+  (show-paren-mode 1)
+  (setq show-paren-delay 0
+        show-paren-style 'parenthesis
+
+        ;; не разрывать баланс пар
+        electric-pair-preserve-balance t)
 #+end_src
 
-** Language Modes
-  :PROPERTIES:
-  :CUSTOM_ID: language-modes
-  :END:
-
-#+subsection* Python
-  :PROPERTIES:
-  :CUSTOM_ID: python
-  :END:
-
-  Python mode with LSP (pyright), debugging (debugpy), and optional virtual env support.
-
+** Whitespace
 #+begin_src emacs-lisp
-;; (use-package python-mode
-;;   :custom
-;;   ;; (python-shell-interpreter "python3")
-;;   ;; (dap-python-executable "python3")
-;;   (dap-python-debugger 'debugpy)
-;;   :config
-;;   (require 'dap-python))
-;;
-;; (use-package pyvenv
-;;   :config (pyvenv-mode 1))
-;;
-;; (use-package lsp-pyright
-;;   :custom (lsp-pyright-langserver-command "pyright")
-;;   :hook (python-mode . (lambda ()
-;;                          (require 'lsp-pyright)
-;;                          (lsp-deferred))))
+  ;; Подсветка пробельных символов:
+  (setq whitespace-style '(face trailing tabs spaces)
+        whitespace-line-column 80)
+  (add-hook 'prog-mode-hook #'whitespace-mode)
 #+end_src
 
-#+subsection* Lua
-  :PROPERTIES:
-  :CUSTOM_ID: lua
-  :END:
-
+** Avy
 #+begin_src emacs-lisp
-(use-package lua-mode)
+  ;; Быстрый переход к любой точке на экране
+  (use-package avy
+    :config
+    (setq avy-all-windows t
+          avy-background t
+          avy-timeout-seconds 0.4))
 #+end_src
 
-#+subsection* Haskell
-  :PROPERTIES:
-  :CUSTOM_ID: haskell
-  :END:
-
+** Expand region
 #+begin_src emacs-lisp
-(use-package haskell-mode)
+  (use-package expand-region
+    :bind ("C-=" . er/expand-region))
 #+end_src
 
-* Evil Mode
-  :PROPERTIES:
-  :CUSTOM_ID: evil-mode
-  :END:
-
-  Vim-style modal editing across the entire editor.
-
+** Move text
 #+begin_src emacs-lisp
-(use-package evil
-  :init
-  (setq evil-want-integration t)
-  (setq evil-want-keybinding nil)
-  :config
-  (evil-mode t))
-
-(use-package evil-collection
-  :after evil
-  :config
-  (evil-collection-init))
-
-(use-package evil-nerd-commenter
-  :bind ("M-/" . evilnc-comment-or-uncomment-lines))
+  ;; Перемещение строк
+  (use-package move-text
+    :config
+    (move-text-default-bindings))
 #+end_src
 
-** TODO: General & Hydra
-  :PROPERTIES:
-  :CUSTOM_ID: todo-general-and-hydra
-  :END:
-
-  Optional helpers for cleaner keymaps and multi-step commands.
-
+** Iedit
 #+begin_src emacs-lisp
-;; (use-package general)
-;; (use-package hydra)
+  ;; Одновременное редактирование всех совпадений слова под курсором
+  (use-package iedit
+    :bind (("C-;" . iedit-mode)))
 #+end_src
+
+** Hl todo
+#+begin_src emacs-lisp
+  ;; Подсветка TODO-ключевых слов
+  (use-package hl-todo
+    :config
+    (global-hl-todo-mode 1))
+#+end_src
+
+** Rainbow delimiters
+#+begin_src emacs-lisp
+  ;; Разные цвета для вложенных скобок
+  (use-package rainbow-delimiters
+    :hook (prog-mode . rainbow-delimiters-mode))
+#+end_src
+
+* File managment
+** Dired
+#+begin_src emacs-lisp
+  (use-package dired
+    :ensure nil
+    :hook ((dired-mode . dired-hide-details-mode)
+           (dired-mode . hl-line-mode))
+    :config
+    (setq dired-listing-switches "-alh --group-directories-first"
+          dired-dwim-target t
+          dired-recursive-copies 'always
+          dired-recursive-deletes 'always
+          delete-by-moving-to-trash t
+          dired-kill-when-opening-new-dired-buffer t)
+    (put 'dired-find-alternate-file 'disabled nil))
+
+  (use-package diredfl
+    :hook (dired-mode . diredfl-mode))
+
+  (use-package dired-subtree
+    :after dired
+    :config
+    ;; TAB в normal state перехватывает Evil (`evil-jump-forward`), поэтому
+    ;; биндинг ставится в состояние, а не в dired-mode-map.
+    (evil-define-key 'normal dired-mode-map (kbd "TAB") #'dired-subtree-toggle)
+    (evil-define-key 'normal dired-mode-map (kbd "<tab>") #'dired-subtree-toggle))
+#+end_src
+
+** Project
+#+begin_src emacs-lisp
+  (use-package project
+    :ensure nil
+    :config
+    (setq project-switch-commands
+          '((project-find-file "Find file")
+            (consult-project-buffer "Buffer")
+            (project-find-regexp "Find regexp")
+            (project-dired "Dired")
+            (project-vc-dir "VC-Dir")
+            (project-eshell "Eshell"))))
+#+end_src
+
+** Ibuffer
+#+begin_src emacs-lisp
+  (use-package ibuffer
+    :ensure nil
+    :bind (("C-x C-b" . ibuffer))
+    :config
+    (setq ibuffer-expert t
+          ibuffer-show-empty-filter-groups nil))
+#+end_src
+
+** Popper
+#+begin_src emacs-lisp
+  ;; Панель вспомогательных буферов
+  (use-package popper
+    :bind (("C-`" . popper-toggle)
+           ("M-`" . popper-cycle))
+    :init
+    (setq popper-reference-buffers
+          '("\\*Messages\\*"
+            "\\*Warnings\\*"
+            "\\*Compile-Log\\*"
+            "\\*Async Shell Command\\*"
+            help-mode
+            comint-mode
+            compilation-mode))
+    :config
+    (popper-mode 1)
+    (popper-echo-mode 1))
+#+end_src
+
+** Ace-window
+#+begin_src emacs-lisp
+  (use-package ace-window
+    :bind (("M-o" . ace-window))
+    :config
+    (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)
+          aw-scope 'frame
+          aw-dispatch-always t))
+#+end_src
+
+* Shell
+#+begin_src emacs-lisp
+  (use-package eat
+    :commands (eat eat-other-window)
+    :bind (("C-c t" . eat)
+           ("C-c T" . eat-other-window))
+    :config
+    (setq eat-kill-buffer-on-exit t))
+
+  ;; Tramp: удалённое редактирование файлов через SSH по умолчанию
+  (setq tramp-default-method "ssh")
+#+end_src
+
+* TODO Programming
+** Magit
+#+begin_src emacs-lisp
+  (use-package magit
+    :bind (("C-x g" . magit-status))
+    :config
+    (setq magit-display-buffer-function
+          #'magit-display-buffer-same-window-except-diff-v1
+          magit-save-repository-buffers 'dontask))
+#+end_src
+
+** Diff-hl
+#+begin_src emacs-lisp
+  (use-package diff-hl
+    :hook ((prog-mode . diff-hl-mode)
+           (org-mode . diff-hl-mode)
+           (dired-mode . diff-hl-dired-mode)))
+#+end_src
+
+** Eglot
+#+begin_src emacs-lisp
+#+end_src
+
+** Apheleia
+#+begin_src emacs-lisp
+#+end_src
+
+** Tempel
+#+begin_src emacs-lisp
+#+end_src
+
+** Treesit
+#+begin_src emacs-lisp
+#+end_src
+
+** Modes
+#+begin_src emacs-lisp
+#+end_src
+
+* TODO AI
+** Gptel
+#+begin_src emacs-lisp
+#+end_src
+
