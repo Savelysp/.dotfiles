@@ -29,6 +29,8 @@
 
     # CLI 
     btop    # Better top
+    neohtop
+    bottom
     zoxide  # Better cd
     bat     # Better cat
     eza     # Better ls
@@ -37,6 +39,11 @@
     fzf     # Fuzzy finder
     stow    # Dotfiles manager
     brightnessctl  # Brightness control
+    cloc
+    blobdrop
+    speedread
+    ggh
+    tabiew
 
     # Useless CLI
     fastfetch  # Best fetch
