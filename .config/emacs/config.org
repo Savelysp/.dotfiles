@@ -162,7 +162,6 @@
     "Каталог с Org-файлами.")
   ;; Создать структуру если отсутствует
   (make-directory my/org-dir t)
-  (make-directory (expand-file-name "roam" my/org-dir) t)
 
   (use-package org
     :ensure nil
@@ -260,6 +259,38 @@
 #+begin_src emacs-lisp
   (use-package org-roam
     :after org
+    :preface
+    (defconst my/template-dir
+      (expand-file-name "templates" my/org-dir)
+      "Каталог с шаблонами org-roam.")
+    (make-directory my/template-dir t)
+
+    (defconst my/roam-file-pattern
+      "%<%Y%m%d%H%M%S>-${slug}.org"
+      "Шаблон имени файла новой заметки.")
+
+    (defconst my/roam-head
+      "#+title: ${title}\n#+date: %U\n"
+      "Общая шапка новой заметки.")
+
+    (defun my/roam-capture-template (key name file)
+    "Собрать элемент `org-roam-capture-templates'.
+     KEY — клавиша, NAME — описание, FILE — имя файла шаблона."
+    `(,key ,name plain
+           (file ,(expand-file-name file my/template-dir))
+           :target (file+head ,my/roam-file-pattern ,my/roam-head)
+           :unnarrowed t))
+
+    (defconst my/roam-template-specs
+      '(("c" "Concept"  "concept.org")
+        ("k" "Claim"    "claim.org")
+        ("t" "Tool"     "tool.org")
+        ("l" "Language" "language.org")
+        ("s" "Source"   "source.org")
+        ("m" "MOC"      "moc.org")
+        ("p" "Project"  "project.org")
+        ("q" "Question" "question.org")))
+
     :bind (("C-c n f" . org-roam-node-find)
            ("C-c n i" . org-roam-node-insert)
            ("C-c n l" . org-roam-buffer-toggle)
@@ -270,9 +301,17 @@
           ;; Автодополнение ссылками Roam везде
           org-roam-completion-everywhere t
           ;; Директория для daily
-          org-roam-dailies-directory (expand-file-name "daily" my/org-dir))
+          org-roam-dailies-directory "daily"
+          org-roam-node-display-template
+          (concat "${title:*} " (propertize "${tags:40}" 'face 'org-tag)))
 
-    (make-directory org-roam-dailies-directory t)
+    (setq org-roam-capture-templates
+        (mapcar (lambda (spec)
+                  (apply #'my/roam-capture-template spec))
+                my/roam-template-specs))
+
+    (make-directory
+     (expand-file-name org-roam-dailies-directory org-roam-directory) t)
     (org-roam-db-autosync-mode 1))
 
   (use-package org-roam-ui)
@@ -407,13 +446,19 @@
     "j l" #'avy-goto-line
     "j w" #'avy-goto-word-1
 
+    ;; Roam
+    "r" '(:ignore t :which-key "roam")
+    "r i" #'org-roam-node-insert
+    "r f" #'org-roam-node-find
+    "r u" #'org-roam-ui-mode
+    "r d" #'org-roam-dailies-map
+    "r l" #'org-roam-buffer-toggle
+
     ;; Org
     "o" '(:ignore t :which-key "org")
     "o a" #'org-agenda
     "o c" #'org-capture
     "o l" #'org-store-link
-    "o r" #'org-roam-node-find
-    "o i" #'org-roam-node-insert
 
     ;; Терминал
     "t" '(:ignore t :which-key "terminal")
@@ -542,6 +587,15 @@
 #+end_src
 
 * Editing
+** Centered cursor
+#+begin_src emacs-lisp
+  (use-package centered-cursor-mode
+    :demand
+    :config
+    ;; Optional, enables centered-cursor-mode in all buffers.
+    (global-centered-cursor-mode))
+#+end_src
+
 ** Pairs
 #+begin_src emacs-lisp
   ;; Автоматическое закрытие пар
