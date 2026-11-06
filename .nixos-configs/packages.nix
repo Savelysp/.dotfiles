@@ -44,6 +44,7 @@
     speedread
     ggh
     tabiew
+    ntfs3g
 
     # Useless CLI
     fastfetch  # Best fetch
@@ -70,11 +71,24 @@
     # File manager
     yazi
 
+    # Python
+    python314
+    python314Packages.pip
+    uv
+    pyright
+    mypy
+    ruff
+
+    # Rust
+    rustc
+    cargo
+    rust-analyzer
+    clippy
+    rustfmt
+
     # Code
     gcc
     tree-sitter
-    python314
-    python314Packages.pip
     nodejs
    
     # Term
