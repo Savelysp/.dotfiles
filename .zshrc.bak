@@ -2,7 +2,7 @@ eval "$(starship init zsh)"
 
 eval "$(zoxide init zsh)"
 
-# alias emacs="emacsclient -c -a 'emacs'"
+alias emacs="emacsclient -c -a 'emacs'"
 # alias emdaemon="emacs --daemon"
 # alias ls="ls --color=tty"
 alias ls="eza --icons=always"
