@@ -104,6 +104,8 @@ spawn-at-startup "mako"
 spawn-at-startup "awww-daemon"
 spawn-sh-at-startup "awww img \"$(find ~/wallpapers -type f | shuf -n1)\""
 
+spawn-at-startup "emacs --daemon"
+
 // Буфен обмена
 spawn-at-startup "wl-paste" "--type" "text"
 spawn-at-startup "wl-paste" "--type" "image"
