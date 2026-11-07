@@ -5,7 +5,7 @@
     # Text Editors
     vim     # Base editor
     neovim  # Better vim
-    emacs   # Best editor
+    emacs-pgtk   # Best editor
 
     # Wayland
     fuzzel
