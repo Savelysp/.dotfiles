@@ -38,6 +38,9 @@
   (blink-cursor-mode -1)           ;; Отключить мигание курсора
   (set-fringe-mode 4)              ;; Уменьшить отступы по краям
 
+  (global-auto-revert-mode 1)      ;; Перезаписывать файлы
+  (global-so-long-mode 1)          ;; Оптимизация длинных строк
+
   ;; Курсор не виден в неактивных окнах
   ;; Не сжимать шрифтовые кэши — ускоряет переключение шрифтов
   (setq cursor-in-non-selected-windows nil
@@ -52,8 +55,8 @@
 ** Transparent
 #+begin_src emacs-lisp
   ;; Прозрачность фона
-  ;; (set-frame-parameter nil 'alpha-background 95)
-  ;; (add-to-list 'default-frame-alist '(alpha-background . 95))
+  (set-frame-parameter nil 'alpha-background 95)
+  (add-to-list 'default-frame-alist '(alpha-background . 95))
 #+end_src
 
 ** Indents
@@ -196,7 +199,8 @@
      ("yml"  . "src yaml")
      ("py"   . "src python")))
 
-    ;; (setf (cdr (assoc 'file org-link-frame-setup)) 'find-file)
+    ;; Открытие ссылок
+    (setf (cdr (assoc 'file org-link-frame-setup)) 'find-file)
 
     ;; Основные настройки Org:
     (setq org-directory my/org-dir
@@ -317,6 +321,11 @@
   (use-package org-roam-ui)
 #+end_src
 
+** Markdown mode
+#+begin_src emacs-lisp
+  (use-package markdown-mode)
+#+end_src
+
 * Evil mode
 ** Evil core
 #+begin_src emacs-lisp
@@ -410,6 +419,12 @@
     "b n" #'next-buffer
     "b p" #'previous-buffer
 
+    ;; Выход
+    "q" '(:ignore t :which-key "leaving")
+    "q r" #'restart-emacs
+    "q q" #'kill-emacs
+    "q c" #'save-buffers-kill-terminal
+
     ;; Проекты
     "p" '(:ignore t :which-key "project")
     "p p" #'project-switch-project
@@ -459,6 +474,7 @@
     "o a" #'org-agenda
     "o c" #'org-capture
     "o l" #'org-store-link
+    "o o" #'org-open-at-point
 
     ;; Терминал
     "t" '(:ignore t :which-key "terminal")
@@ -636,9 +652,9 @@
 ** Move text
 #+begin_src emacs-lisp
   ;; Перемещение строк
-  (use-package move-text
-    :config
-    (move-text-default-bindings))
+  ;; (use-package move-text
+  ;;   :bind (("C-j" . move-text-down)
+  ;;          ("C-k" . move-text-up)))
 #+end_src
 
 ** Iedit
@@ -779,6 +795,12 @@
 
 ** Eglot
 #+begin_src emacs-lisp
+  ;; (use-package eglot
+  ;;   :ensure nil
+  ;;   :hook (prog-mode . eglot-ensure)
+  ;;   :config
+  ;;   (setq eglot-autoshutdown t
+  ;;         eglot-sync-connect nil))
 #+end_src
 
 ** Apheleia
